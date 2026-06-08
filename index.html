@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sofía & Mateo — Confirmación de Asistencia</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  
+  <!-- Tailwind CSS Play CDN (Correct & Secure Link) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8D5A3;
+      --gold-dark: #8B6914;
+      --cream: #FAF7F2;
+      --dark: #1A1612;
+      --muted: #6B5E4E;
+      --rose: #D4847A;
+    }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+
+    body {
+      background-color: var(--cream);
+      color: var(--dark);
+      font-family: 'Jost', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--cream);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 3px;
+    }
+
+    #app {
+      min-height: 100vh;
+      color: var(--dark);
+      padding: 0 0 4rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Canvas decoration styling */
+    #sparkle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      border-bottom: 0.5px solid #DDD3C5;
+      background: linear-gradient(180deg, #F5EFE4 0%, var(--cream) 100%);
+      position: relative;
+    }
+
+    .header::before {
+      content: '✦';
+      display: block;
+      font-size: 18px;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      letter-spacing: 12px;
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 38px;
+      font-weight: 300;
+      letter-spacing: 3px;
+      color: var(--dark);
+      line-height: 1.2;
+    }
+
+    .header h1 em {
+      font-style: italic;
+      color: var(--gold-dark);
+      font-weight: 400;
+    }
+
+    .header .subtitle {
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
+      font-weight: 400;
+    }
+
+    .header .event-date {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      color: var(--muted);
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .ornament {
+      text-align: center;
+      color: var(--gold-light);
+      font-size: 14px;
+      letter-spacing: 8px;
+      margin: 1.5rem 0;
+    }
+
+    .screen { 
+      display: none; 
+      padding: 1.5rem 1.25rem; 
+    }
+    
+    .screen.active { 
+      display: block; 
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-section { 
+      max-width: 500px; 
+      margin: 0 auto; 
+    }
+
+    .search-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 300;
+      text-align: center;
+      color: var(--dark);
+      margin-bottom: 0.4rem;
+    }
+
+    .search-hint {
+      font-size: 13px;
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 15px;
+      background: white;
+      color: var(--dark);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box input:focus { 
+      border-color: var(--gold); 
+      box-shadow: 0 0 8px rgba(201, 168, 76, 0.15);
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .results-list {
+      list-style: none;
+      background: white;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 4px;
+      overflow: hidden;
+      max-height: 280px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .results-list li {
+      padding: 14px 18px;
+      border-bottom: 0.5px solid #EDE5D8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.15s;
+    }
+
+    .results-list li:last-child { 
+      border-bottom: none; 
+    }
+    
+    .results-list li:hover { 
+      background: #FAF5EC; 
+    }
+
+    .guest-name {
+      font-size: 15px;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    .guest-table {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .guest-status {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pending { background: #F5EDE0; color: #8B6914; }
+    .status-confirmed { background: #E0EDD6; color: #3A6B20; }
+    .status-declined { background: #F5E0E0; color: #8B2020; }
+
+    .arrow-icon { 
+      color: var(--gold); 
+      font-size: 16px; 
+    }
+
+    .no-results {
+      padding: 2.5rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .confirm-card {
+      max-width: 460px;
+      margin: 0 auto;
+      background: white;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+
+    .confirm-header {
+      background: #1A1612;
+      padding: 1.75rem;
+      text-align: center;
+    }
+
+    .confirm-header .guest-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+
+    .confirm-header .guest-full-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: white;
+      letter-spacing: 1px;
+    }
+
+    .confirm-header .guest-info {
+      font-size: 12px;
+      color: #9B8E7E;
+      margin-top: 4px;
+    }
+
+    .confirm-body { 
+      padding: 1.75rem; 
+    }
+
+    .confirm-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 300;
+      text-align: center;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+    }
+
+    .confirm-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-confirm {
+      padding: 14px;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+      background: white;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-yes { border-color: #8BA86B; color: #3A6B20; }
+    .btn-no { border-color: #C4958E; color: #8B2020; }
+
+    .btn-yes:hover, .btn-yes.selected { 
+      background: #8BA86B; 
+      color: white; 
+      border-color: #8BA86B; 
+      box-shadow: 0 4px 10px rgba(139, 168, 107, 0.25);
+    }
+    
+    .btn-no:hover, .btn-no.selected { 
+      background: var(--rose); 
+      color: white; 
+      border-color: var(--rose); 
+      box-shadow: 0 4px 10px rgba(212, 132, 122, 0.25);
+    }
+
+    .dietary-section {
+      margin-top: 1rem;
+    }
+
+    .field-label {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+      font-weight: 500;
+    }
+
+    .dietary-section input, .dietary-section select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 14px;
+      background: white;
+      color: var(--dark);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .dietary-section input:focus, .dietary-section select:focus {
+      border-color: var(--gold);
+    }
+
+    .guests-count {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--dark);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 1.25rem;
+      transition: background 0.2s, transform 0.1s;
+      font-weight: 500;
+    }
+
+    .btn-submit:hover { 
+      background: #2D2620; 
+    }
+    
+    .btn-submit:active {
+      transform: scale(0.99);
+    }
+
+    .btn-back {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+
+    .btn-back:hover {
+      color: var(--dark);
+    }
+
+    .qr-card {
+      max-width: 420px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .qr-success {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #EAF3DE;
+      border-radius: 4px;
+      padding: 12px 18px;
+      margin-bottom: 1.5rem;
+      font-size: 14px;
+      color: #3A6B20;
+      font-weight: 500;
+      border: 0.5px solid rgba(58, 107, 32, 0.15);
+    }
+
+    .qr-wrapper {
+      background: white;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 6px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .qr-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 300;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .qr-event-name {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-weight: 400;
+    }
+
+    #qr-canvas {
+      display: block;
+      margin: 0 auto 1.5rem;
+      border: 0.5px solid #EDE5D8;
+      border-radius: 4px;
+      padding: 10px;
+      background: white;
+    }
+
+    .qr-detail {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-top: 0.5px solid #EDE5D8;
+    }
+
+    .qr-detail span:last-child { 
+      color: var(--dark); 
+      font-weight: 500; 
+    }
+
+    .download-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--gold-dark);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+      font-weight: 500;
+    }
+
+    .download-btn:hover { 
+      background: #6B4E10; 
+    }
+
+    .download-btn:active {
+      transform: scale(0.99);
+    }
+
+    .hint-save {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 12px;
+      font-style: italic;
+    }
+
+    .declined-card {
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: white;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 6px;
+    }
+
+    .declined-icon { 
+      font-size: 44px; 
+      color: #C4958E; 
+      margin-bottom: 1.25rem; 
+    }
+
+    .declined-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .declined-msg { 
+      font-size: 14px; 
+      color: var(--muted); 
+      line-height: 1.6; 
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-toggle {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 0.5px solid #DDD3C5;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .admin-link {
+      font-size: 12px;
+      color: #B4A48C;
+      letter-spacing: 1px;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      background: none;
+      font-family: 'Jost', sans-serif;
+      transition: color 0.15s;
+    }
+
+    .admin-link:hover {
+      color: var(--gold-dark);
+    }
+
+    .admin-panel {
+      background: white;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .admin-head {
+      background: #F5EFE4;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 0.5px solid #DDD3C5;
+    }
+
+    .admin-head h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-bottom: 0.5px solid #EDE5D8;
+    }
+
+    .stat-cell {
+      padding: 1.25rem 1rem;
+      text-align: center;
+      border-right: 0.5px solid #EDE5D8;
+    }
+
+    .stat-cell:last-child { 
+      border-right: none; 
+    }
+
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 300;
+      line-height: 1.1;
+    }
+
+    .stat-num.gold { color: var(--gold-dark); }
+    .stat-num.green { color: #4A7A28; }
+    .stat-num.rose { color: var(--rose); }
+
+    .stat-lbl { 
+      font-size: 11px; 
+      letter-spacing: 1.5px; 
+      text-transform: uppercase; 
+      color: var(--muted); 
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .admin-list { 
+      max-height: 320px; 
+      overflow-y: auto; 
+    }
+
+    .admin-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 1.5rem;
+      border-bottom: 0.5px solid #F0E8DC;
+      gap: 12px;
+    }
+
+    .admin-row:last-child { 
+      border-bottom: none; 
+    }
+
+    .admin-name { 
+      flex: 1; 
+      font-size: 14px; 
+      text-align: left;
+      font-weight: 500;
+    }
+    
+    .admin-table { 
+      font-size: 12px; 
+      color: var(--muted); 
+      width: 90px; 
+      text-align: left;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .badge-p { background: #F5EDE0; color: #8B6914; }
+    .badge-c { background: #E0EDD6; color: #3A6B20; }
+    .badge-d { background: #F5E0E0; color: #8B2020; }
+
+    .add-guest-row {
+      padding: 1.25rem 1.5rem;
+      border-top: 0.5px solid #DDD3C5;
+      display: flex;
+      gap: 10px;
+      background: #FAF8F5;
+    }
+
+    .add-guest-row input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      background: white;
+      color: var(--dark);
+      outline: none;
+    }
+
+    .add-guest-row input:focus {
+      border-color: var(--gold);
+    }
+
+    .add-guest-row select {
+      padding: 10px;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      background: white;
+      color: var(--dark);
+      outline: none;
+    }
+
+    .btn-add {
+      padding: 10px 18px;
+      background: var(--dark);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .btn-add:hover { 
+      background: #2D2620; 
+    }
+
+    .settings-row {
+      padding: 1.25rem 1.5rem;
+      border-top: 0.5px solid #DDD3C5;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: #FAF8F5;
+      flex-wrap: wrap;
+    }
+
+    .settings-row input {
+      flex: 1;
+      min-width: 140px;
+      padding: 10px 12px;
+      border: 0.5px solid #C8BAA6;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      background: white;
+      color: var(--dark);
+      outline: none;
+    }
+
+    .settings-row input:focus {
+      border-color: var(--gold);
+    }
+
+    .settings-row label { 
+      font-size: 13px; 
+      color: var(--muted); 
+      white-space: nowrap; 
+      font-weight: 500;
+    }
+
+    .btn-save-settings {
+      padding: 10px 18px;
+      background: var(--gold-dark);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-save-settings:hover {
+      background: #6B4E10;
+    }
+
+    /* Elegant Custom Notification Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: #1A1612;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #toast i {
+      color: var(--gold-light);
+      font-size: 18px;
+    }
+  </style>
+
+  <!-- Safe defensive configuration of Tailwind to prevent any script failures -->
+  <script>
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              gold: {
+                DEFAULT: '#C9A84C',
+                light: '#E8D5A3',
+                dark: '#8B6914',
+              },
+              cream: {
+                DEFAULT: '#FAF7F2',
+                dark: '#EDE5D8',
+              },
+              dark: '#1A1612',
+              muted: '#6B5E4E',
+              rose: '#D4847A',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Premium Sparkle Background -->
+  <canvas id="sparkle-canvas"></canvas>
+
+  <!-- Application Shell -->
+  <div id="app">
+    <div class="header">
+      <h1><em>Sofía</em> &amp; <em>Mateo</em></h1>
+      <p class="subtitle" id="header-subtitle">Confirmación de asistencia</p>
+      <p class="event-date" id="header-date">Sábado, 14 de febrero de 2026 · 19:00 hrs</p>
+    </div>
+
+    <div class="ornament">· · ✦ · ·</div>
+
+    <!-- SCREEN 1: SEARCH PORTAL -->
+    <div id="screen-search" class="screen active">
+      <div class="search-section">
+        <p class="search-label">Busca tu nombre</p>
+        <p class="search-hint">Escribe tu nombre para encontrar tu invitación</p>
+        <div class="search-box">
+          <i class="ti ti-search" aria-hidden="true"></i>
+          <input type="text" id="search-input" placeholder="Ej. María García..." autocomplete="off" />
+        </div>
+        <ul class="results-list" id="results-list" style="display:none"></ul>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: RSVP FORM -->
+    <div id="screen-confirm" class="screen">
+      <div class="confirm-card">
+        <div class="confirm-header">
+          <p class="guest-label">Invitado</p>
+          <p class="guest-full-name" id="cf-name">—</p>
+          <p class="guest-info" id="cf-table">—</p>
+        </div>
+        <div class="confirm-body">
+          <button class="btn-back" onclick="showScreen('search')">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i> Volver a buscar
+          </button>
+          
+          <p class="confirm-question">¿Confirmas tu asistencia?</p>
+          
+          <div class="confirm-buttons">
+            <button class="btn-confirm btn-yes" id="btn-yes" onclick="selectAttending(true)">
+              <i class="ti ti-check" aria-hidden="true"></i> Sí, asistiré
+            </button>
+            <button class="btn-confirm btn-no" id="btn-no" onclick="selectAttending(false)">
+              <i class="ti ti-x" aria-hidden="true"></i> No podré ir
+            </button>
+          </div>
+          
+          <div id="yes-fields" style="display:none">
+            <div class="guests-count">
+              <div>
+                <label class="field-label">Adultos</label>
+                <select id="adults-count">
+                  <option value="1">1 adulto</option>
+                  <option value="2" selected>2 adultos</option>
+                  <option value="3">3 adultos</option>
+                  <option value="4">4 adultos</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Niños</label>
+                <select id="kids-count">
+                  <option value="0" selected>Sin niños</option>
+                  <option value="1">1 niño</option>
+                  <option value="2">2 niños</option>
+                  <option value="3">3 niños</option>
+                </select>
+              </div>
+            </div>
+            <div class="dietary-section">
+              <label class="field-label">Restricción alimentaria (opcional)</label>
+              <input type="text" id="dietary" placeholder="Ej. vegetariano, sin gluten..." />
+            </div>
+          </div>
+          
+          <button class="btn-submit" id="btn-submit" onclick="submitConfirmation()" style="display:none">
+            Confirmar Respuesta
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: CONFIRMED QR TICKET -->
+    <div id="screen-qr" class="screen">
+      <div class="qr-card">
+        <div class="qr-success">
+          <i class="ti ti-circle-check-filled" aria-hidden="true"></i>
+          ¡Asistencia confirmada con éxito!
+        </div>
+        <div class="qr-wrapper">
+          <p class="qr-name" id="qr-name">—</p>
+          <p class="qr-event-name" id="qr-event-label">Boda · 14 Feb 2026</p>
+          <canvas id="qr-canvas" width="180" height="180"></canvas>
+          <div class="qr-detail">
+            <span>Mesa asignada</span>
+            <span id="qr-table-info">—</span>
+          </div>
+          <div class="qr-detail">
+            <span>Boletos autorizados</span>
+            <span id="qr-pax">—</span>
+          </div>
+          <div class="qr-detail">
+            <span>Código de Acceso</span>
+            <span id="qr-code-text" style="font-family:monospace; font-weight:600; color:var(--gold-dark);">—</span>
+          </div>
+        </div>
+        <button class="download-btn" onclick="downloadQR()">
+          <i class="ti ti-download" aria-hidden="true"></i>
+          Descargar Pase Digital
+        </button>
+        <p class="hint-save">Guarda esta imagen para presentarla en la entrada del evento</p>
+        
+        <button class="mt-6 text-xs text-muted hover:text-dark underline block mx-auto cursor-pointer" onclick="showScreen('search')">
+          Volver al Inicio
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: DECLINED RESPONSE -->
+    <div id="screen-declined" class="screen">
+      <div class="declined-card">
+        <div class="declined-icon"><i class="ti ti-heart-off" aria-hidden="true"></i></div>
+        <p class="declined-title">Lamentamos que no puedas ir</p>
+        <p class="declined-msg">Hemos registrado que no podrás asistir. Te extrañaremos mucho y agradecemos enormemente tu oportuna respuesta.</p>
+        <button class="btn-submit" onclick="showScreen('search')">
+          Volver al Buscador
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: CONTROL PANEL (ADMIN) -->
+    <div class="admin-toggle">
+      <button class="admin-link" onclick="toggleAdmin()"><i class="ti ti-settings" aria-hidden="true"></i> Panel de Administración</button>
+      
+      <div id="admin-section" style="display:none">
+        <div class="settings-row">
+          <div class="flex flex-col text-left mb-2 w-full sm:w-auto">
+            <label>Nombre del Evento:</label>
+            <input type="text" id="event-name-input" placeholder="Nombre del evento" value="Boda de Sofía & Mateo" />
+          </div>
+          <div class="flex flex-col text-left mb-2 w-full sm:w-auto">
+            <label>Fecha y Hora:</label>
+            <input type="text" id="event-date-input" placeholder="Fecha del evento" value="14 Feb 2026" />
+          </div>
+          <button class="btn-save-settings mt-3 sm:mt-auto" onclick="saveSettings()">Actualizar Datos</button>
+        </div>
+        
+        <div class="admin-panel">
+          <div class="admin-head">
+            <h3>Lista de Invitados</h3>
+            <button onclick="exportToCSV()" class="text-xs bg-white text-dark border border-cream-dark px-3 py-1.5 rounded hover:bg-cream transition-colors flex items-center gap-1.5 font-medium"><i class="ti ti-file-export"></i> CSV</button>
+          </div>
+          <div class="stats-row">
+            <div class="stat-cell">
+              <div class="stat-num gold" id="stat-total">0</div>
+              <div class="stat-lbl">Invitados</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-num green" id="stat-confirmed">0</div>
+              <div class="stat-lbl">Confirmados</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-num rose" id="stat-declined">0</div>
+              <div class="stat-lbl">Declinaron</div>
+            </div>
+          </div>
+          
+          <div class="admin-list" id="admin-list"></div>
+          
+          <div class="add-guest-row">
+            <input type="text" id="new-guest-name" placeholder="Nombre completo" />
+            <input type="text" id="new-guest-table" placeholder="Mesa" style="width:100px; flex:none" />
+            <button class="btn-add" onclick="addGuest()"><i class="ti ti-plus" aria-hidden="true"></i> Agregar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Popup Toast Notification element -->
+  <div id="toast">
+    <i class="ti ti-circle-check" id="toast-icon"></i>
+    <span id="toast-text">Notificación exitosa</span>
+  </div>
+
+  <!-- Official Client QRCode JS library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
+  <script>
+    // Robust Key Configuration
+    const STORAGE_KEY = 'event_guests_v3';
+    const SETTINGS_KEY = 'event_settings_v1';
+
+    // Premium Default Wedding Database Backup
+    const defaultGuests = [
+      { id:'g001', name:'Ana Martínez López', table:'Mesa 1', status:'pending', dietary:'', pax:2, adults:2, kids:0 },
+      { id:'g002', name:'Carlos Mendoza', table:'Mesa 2', status:'pending', dietary:'', pax:3, adults:2, kids:1 },
+      { id:'g003', name:'Laura Jiménez', table:'Mesa 1', status:'pending', dietary:'', pax:2, adults:2, kids:0 },
+      { id:'g004', name:'Roberto García Soto', table:'Mesa 3', status:'pending', dietary:'', pax:4, adults:2, kids:2 },
+      { id:'g005', name:'Fernanda López', table:'Mesa 2', status:'pending', dietary:'', pax:2, adults:2, kids:0 },
+      { id:'g006', name:'Miguel Ángel Torres', table:'Mesa 4', status:'pending', dietary:'', pax:2, adults:2, kids:0 },
+      { id:'g007', name:'Patricia Ruiz', table:'Mesa 3', status:'pending', dietary:'', pax:2, adults:1, kids:1 },
+      { id:'g008', name:'Javier Hernández', table:'Mesa 4', status:'pending', dietary:'', pax:3, adults:3, kids:0 },
+      { id:'g009', name:'Diana Castillo', table:'Mesa 5', status:'pending', dietary:'', pax:2, adults:2, kids:0 },
+      { id:'g010', name:'Eduardo Reyes', table:'Mesa 5', status:'pending', dietary:'', pax:2, adults:2, kids:0 },
+    ];
+
+    // Safe, multi-platform database helper
+    const storage = {
+      async get(key) {
+        if (window.storage && typeof window.storage.get === 'function') {
+          try {
+            const res = await window.storage.get(key);
+            return res ? res.value : null;
+          } catch (e) {
+            console.warn("Plat-get fallback executing:", e);
+          }
+        }
+        return localStorage.getItem(key);
+      },
+      async set(key, val) {
+        if (window.storage && typeof window.storage.set === 'function') {
+          try {
+            await window.storage.set(key, val);
+            return;
+          } catch (e) {
+            console.warn("Plat-set fallback executing:", e);
+          }
+        }
+        localStorage.setItem(key, val);
+      }
+    };
+
+    let guests = [];
+    let settings = { eventName: 'Boda de Sofía & Mateo', eventDate: '14 Feb 2026' };
+    let selectedGuest = null;
+    let attending = null;
+
+    async function loadData() {
+      try {
+        const gr = await storage.get(STORAGE_KEY);
+        if (gr) {
+          guests = JSON.parse(gr);
+        } else { 
+          guests = JSON.parse(JSON.stringify(defaultGuests)); 
+          await saveData(); 
+        }
+      } catch(e) { 
+        guests = JSON.parse(JSON.stringify(defaultGuests)); 
+      }
+
+      try {
+        const sr = await storage.get(SETTINGS_KEY);
+        if (sr) { 
+          settings = JSON.parse(sr); 
+          applySettings(); 
+        }
+      } catch(e) {}
+
+      updateAdminStats();
+      renderAdminList();
+      initSparkles();
+    }
+
+    async function saveData() {
+      try { 
+        await storage.set(STORAGE_KEY, JSON.stringify(guests)); 
+      } catch(e) {}
+    }
+
+    async function saveSettingsData() {
+      try { 
+        await storage.set(SETTINGS_KEY, JSON.stringify(settings)); 
+      } catch(e) {}
+    }
+
+    function applySettings() {
+      document.getElementById('event-name-input').value = settings.eventName;
+      document.getElementById('event-date-input').value = settings.eventDate;
+      document.getElementById('header-subtitle').textContent = `Confirmación: ${settings.eventName}`;
+      document.getElementById('header-date').textContent = settings.eventDate;
+      document.getElementById('qr-event-label').textContent = settings.eventName + ' · ' + settings.eventDate;
+    }
+
+    function saveSettings() {
+      settings.eventName = document.getElementById('event-name-input').value || settings.eventName;
+      settings.eventDate = document.getElementById('event-date-input').value || settings.eventDate;
+      saveSettingsData();
+      applySettings();
+      showToast("Configuración guardada exitosamente", "ti-circle-check");
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + id).classList.add('active');
+      if (id === 'search') { 
+        document.getElementById('search-input').value = ''; 
+        document.getElementById('results-list').style.display = 'none'; 
+        attending = null; 
+      }
+    }
+
+    const searchInput = document.getElementById('search-input');
+    const resultsList = document.getElementById('results-list');
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) { 
+        resultsList.style.display = 'none'; 
+        return; 
+      }
+      const matches = guests.filter(g => g.name.toLowerCase().includes(q));
+      if (!matches.length) {
+        resultsList.style.display = 'block';
+        resultsList.innerHTML = '<div class="no-results">No se encontró ningún invitado con ese nombre</div>';
+        return;
+      }
+      resultsList.style.display = 'block';
+      resultsList.innerHTML = matches.map(g => {
+        const sc = g.status === 'confirmed' ? 'status-confirmed' : g.status === 'declined' ? 'status-declined' : 'status-pending';
+        const sl = g.status === 'confirmed' ? 'Confirmado' : g.status === 'declined' ? 'Declinó' : 'Pendiente';
+        return `<li onclick="selectGuest('${g.id}')">
+          <div>
+            <div class="guest-name">${g.name}</div>
+            <div class="guest-table">${g.table}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="guest-status ${sc}">${sl}</span>
+            <i class="ti ti-chevron-right arrow-icon" aria-hidden="true"></i>
+          </div>
+        </li>`;
+      }).join('');
+    });
+
+    function selectGuest(id) {
+      selectedGuest = guests.find(g => g.id === id);
+      if (!selectedGuest) return;
+      document.getElementById('cf-name').textContent = selectedGuest.name;
+      document.getElementById('cf-table').textContent = selectedGuest.table;
+      document.getElementById('btn-yes').classList.remove('selected');
+      document.getElementById('btn-no').classList.remove('selected');
+      document.getElementById('yes-fields').style.display = 'none';
+      document.getElementById('btn-submit').style.display = 'none';
+      document.getElementById('dietary').value = selectedGuest.dietary || '';
+      
+      // Reset Selectors to current data
+      document.getElementById('adults-count').value = selectedGuest.adults || 2;
+      document.getElementById('kids-count').value = selectedGuest.kids || 0;
+      
+      attending = null;
+      showScreen('confirm');
+    }
+
+    function selectAttending(val) {
+      attending = val;
+      document.getElementById('btn-yes').classList.toggle('selected', val);
+      document.getElementById('btn-no').classList.toggle('selected', !val);
+      document.getElementById('yes-fields').style.display = val ? 'block' : 'none';
+      document.getElementById('btn-submit').style.display = 'block';
+    }
+
+    async function submitConfirmation() {
+      if (!selectedGuest || attending === null) return;
+      const idx = guests.findIndex(g => g.id === selectedGuest.id);
+      
+      if (attending) {
+        const adults = parseInt(document.getElementById('adults-count').value) || 1;
+        const kids = parseInt(document.getElementById('kids-count').value) || 0;
+        const dietary = document.getElementById('dietary').value.trim();
+        
+        guests[idx].status = 'confirmed';
+        guests[idx].pax = adults + kids;
+        guests[idx].dietary = dietary;
+        guests[idx].adults = adults;
+        guests[idx].kids = kids;
+        selectedGuest = guests[idx];
+        
+        await saveData();
+        updateAdminStats();
+        renderAdminList();
+        showQR();
+        showToast("¡Asistencia confirmada!", "ti-circle-check");
+      } else {
+        guests[idx].status = 'declined';
+        guests[idx].pax = 0;
+        guests[idx].adults = 0;
+        guests[idx].kids = 0;
+        guests[idx].dietary = '';
+        
+        await saveData();
+        updateAdminStats();
+        renderAdminList();
+        showScreen('declined');
+        showToast("Respuesta enviada", "ti-heart-off");
+      }
+    }
+
+    function showQR() {
+      showScreen('qr');
+      document.getElementById('qr-name').textContent = selectedGuest.name;
+      document.getElementById('qr-event-label').textContent = settings.eventName + ' · ' + settings.eventDate;
+      document.getElementById('qr-table-info').textContent = selectedGuest.table;
+      
+      const adultsNum = selectedGuest.adults || 1;
+      const kidsNum = selectedGuest.kids || 0;
+      const paxTxt = adultsNum + ' adulto' + (adultsNum > 1 ? 's' : '') + (kidsNum > 0 ? ` + ${kidsNum} niño${kidsNum > 1 ? 's' : ''}` : '');
+      document.getElementById('qr-pax').textContent = paxTxt;
+      
+      const code = selectedGuest.id.toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString(16).toUpperCase();
+      document.getElementById('qr-code-text').textContent = code;
+      selectedGuest.qrCode = code;
+
+      const canvas = document.getElementById('qr-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 180, 180);
+
+      const qrData = JSON.stringify({ 
+        id: selectedGuest.id, 
+        name: selectedGuest.name, 
+        table: selectedGuest.table, 
+        pax: selectedGuest.pax, 
+        code: code, 
+        event: settings.eventName 
+      });
+
+      try {
+        // Clear previous container content safely
+        const tempContainer = document.createElement('div');
+        const qr = new QRCode(tempContainer, {
+          text: qrData,
+          width: 160,
+          height: 160,
+          colorDark: '#1A1612',
+          colorLight: '#FFFFFF',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        
+        setTimeout(() => {
+          const img = tempContainer.querySelector('img') || tempContainer.querySelector('canvas');
+          if (img) {
+            const tempImg = new Image();
+            tempImg.onload = () => {
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillRect(0, 0, 180, 180);
+              ctx.drawImage(tempImg, 10, 10, 160, 160);
+            };
+            if (img.tagName === 'CANVAS') {
+              tempImg.src = img.toDataURL();
+            } else {
+              tempImg.src = img.src;
+            }
+          }
+        }, 300);
+      } catch(e) {
+        console.error("QR Code library fallback error:", e);
+        ctx.fillStyle = '#1A1612';
+        ctx.font = '11px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('Código QR: ' + code, 90, 90);
+      }
+    }
+
+    function downloadQR() {
+      const canvas = document.getElementById('qr-canvas');
+      const offscreen = document.createElement('canvas');
+      offscreen.width = 340;
+      offscreen.height = 420;
+      const ctx = offscreen.getContext('2d');
+      
+      // Draw luxury backdrop
+      ctx.fillStyle = '#FAF7F2';
+      ctx.fillRect(0, 0, 340, 420);
+      
+      // Draw double gold accents
+      ctx.strokeStyle = '#C9A84C';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(10, 10, 320, 400);
+      ctx.strokeStyle = '#E8D5A3';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(14, 14, 312, 392);
+      
+      // Render text header
+      ctx.fillStyle = '#8B6914';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.letterSpacing = '3px';
+      ctx.fillText(settings.eventName.toUpperCase(), 170, 42);
+      
+      ctx.fillStyle = '#1A1612';
+      ctx.font = '300 22px Georgia, serif';
+      ctx.fillText(selectedGuest.name, 170, 78);
+      
+      ctx.fillStyle = '#6B5E4E';
+      ctx.font = '300 13px sans-serif';
+      ctx.fillText(selectedGuest.table + ' · ' + settings.eventDate, 170, 102);
+      
+      // Inject processed canvas code
+      ctx.drawImage(canvas, 80, 118, 180, 180);
+      
+      // Spacer divider
+      ctx.strokeStyle = '#E8D5A3';
+      ctx.beginPath();
+      ctx.moveTo(30, 318);
+      ctx.lineTo(310, 318);
+      ctx.stroke();
+      
+      ctx.fillStyle = '#6B5E4E';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('Código de Entrada: ' + (document.getElementById('qr-code-text').textContent), 170, 342);
+      
+      ctx.fillStyle = '#8B6914';
+      ctx.font = 'italic 11px Georgia, serif';
+      ctx.fillText('Presentar en recepción del evento', 170, 372);
+
+      // Execute file compilation download
+      const link = document.createElement('a');
+      link.download = 'pase-boda-' + selectedGuest.id + '.png';
+      link.href = offscreen.toDataURL('image/png');
+      link.click();
+      showToast("Pase descargado exitosamente", "ti-download");
+    }
+
+    function toggleAdmin() {
+      const s = document.getElementById('admin-section');
+      s.style.display = s.style.display === 'none' ? 'block' : 'none';
+      if (s.style.display === 'block') {
+        showToast("Panel de administración abierto", "ti-lock-open");
+      }
+    }
+
+    function updateAdminStats() {
+      document.getElementById('stat-total').textContent = guests.length;
+      document.getElementById('stat-confirmed').textContent = guests.filter(g => g.status === 'confirmed').length;
+      document.getElementById('stat-declined').textContent = guests.filter(g => g.status === 'declined').length;
+    }
+
+    function renderAdminList() {
+      const list = document.getElementById('admin-list');
+      
+      // Sorted alphabetically for visual ease
+      const sortedGuests = [...guests].sort((a, b) => a.name.localeCompare(b.name));
+      
+      list.innerHTML = sortedGuests.map(g => {
+        const bc = g.status === 'confirmed' ? 'badge-c' : g.status === 'declined' ? 'badge-d' : 'badge-p';
+        const bl = g.status === 'confirmed' ? 'Confirmado' : g.status === 'declined' ? 'Declinó' : 'Pendiente';
+        return `<div class="admin-row">
+          <span class="admin-name">${g.name}</span>
+          <span class="admin-table">${g.table || 'Sin mesa'}</span>
+          <span class="badge ${bc}">${bl}</span>
+          <button style="background:none; border:none; cursor:pointer; color:#C4958E; padding:0; font-size:16px;" onclick="removeGuest('${g.id}')" title="Eliminar">
+            <i class="ti ti-trash" aria-hidden="true"></i>
+          </button>
+        </div>`;
+      }).join('');
+    }
+
+    async function addGuest() {
+      const name = document.getElementById('new-guest-name').value.trim();
+      const table = document.getElementById('new-guest-table').value.trim() || 'Mesa 1';
+      if (!name) {
+        showToast("Favor de ingresar el nombre", "ti-alert-circle");
+        return;
+      }
+      
+      const id = 'g' + Date.now().toString(36);
+      guests.push({ 
+        id, 
+        name, 
+        table, 
+        status: 'pending', 
+        dietary: '', 
+        pax: 2, 
+        adults: 2, 
+        kids: 0 
+      });
+      
+      await saveData();
+      updateAdminStats();
+      renderAdminList();
+      
+      document.getElementById('new-guest-name').value = '';
+      document.getElementById('new-guest-table').value = '';
+      showToast("Invitado agregado correctamente", "ti-user-plus");
+    }
+
+    async function removeGuest(id) {
+      if (confirm("¿Estás seguro de que deseas eliminar este invitado de la lista?")) {
+        guests = guests.filter(g => g.id !== id);
+        await saveData();
+        updateAdminStats();
+        renderAdminList();
+        showToast("Invitado eliminado", "ti-trash");
+      }
+    }
+
+    function exportToCSV() {
+      if (guests.length === 0) return;
+
+      const headers = ['ID', 'Nombre', 'Mesa', 'Adultos', 'Niños', 'Total Pases', 'Estado', 'Restricciones'];
+      const rows = guests.map(g => [
+        g.id,
+        g.name,
+        g.table || 'Sin Mesa',
+        g.adults || 0,
+        g.kids || 0,
+        g.pax || 0,
+        g.status,
+        g.dietary || ''
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
+        + [headers.join(','), ...rows.map(e => e.map(val => `"${val}"`).join(','))].join('\n');
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "invitados_boda_sofia_mateo.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("CSV Exportado correctamente", "ti-file-spreadsheet");
+    }
+
+    // Custom non-breaking Toast notifier
+    function showToast(text, icon = "ti-circle-check") {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toast-text');
+      const toastIcon = document.getElementById('toast-icon');
+      
+      toastText.textContent = text;
+      toastIcon.className = `ti ${icon}`;
+      
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    function initSparkles() {
+      const canvas = document.getElementById('sparkle-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Sparkle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = canvas.height + 10;
+          this.size = Math.random() * 2 + 0.5;
+          this.speedX = Math.random() * 0.4 - 0.2;
+          this.speedY = Math.random() * 0.4 + 0.2;
+          this.opacity = Math.random() * 0.5 + 0.1;
+          this.fade = Math.random() * 0.01 + 0.002;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y -= this.speedY;
+          this.opacity -= this.fade;
+          if (this.opacity <= 0 || this.y < 0) {
+            this.reset();
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(201, 168, 76, ${this.opacity})`;
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 35; i++) {
+        particles.push(new Sparkle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    // Start App Engine
+    loadData();
+  </script>
+</body>
+</html>
