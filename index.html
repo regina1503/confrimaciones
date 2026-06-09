@@ -3,21 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sofía & Mateo — Confirmación de Asistencia</title>
+  <title>Sofía & Mateo — Confirmación de Asistencia & Accesos</title>
   
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
-  <!-- Tabler Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-  
-  <!-- Tailwind CSS Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
   <style>
     :root {
+      /* --- Theme tokens (controlled by admin panel) --- */
       --gold: #C9A84C;
       --gold-light: #E8D5A3;
       --gold-dark: #8B6914;
@@ -25,1880 +22,1179 @@
       --dark: #1A1612;
       --muted: #6B5E4E;
       --rose: #D4847A;
+      /* Accent overridable */
+      --accent: #C9A84C;
+      --accent-dark: #8B6914;
+      --accent-light: #E8D5A3;
+      --bg: #FAF7F2;
+      --surface: #FFFFFF;
+      --header-bg: #1A1612;
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--dark); font-family: 'Jost', sans-serif; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-    }
-
-    body {
-      background-color: var(--cream);
-      color: var(--dark);
-      font-family: 'Jost', sans-serif;
-      overflow-x: hidden;
-    }
-
-    /* Custom Scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--cream);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: var(--gold);
-      border-radius: 3px;
-    }
-
-    #app {
-      min-height: 100vh;
-      color: var(--dark);
-      padding: 0 0 4rem;
-      position: relative;
-      z-index: 10;
-    }
-
-    /* Canvas decoration styling */
-    #sparkle-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
+    #app { min-height: 100vh; padding: 0 0 4rem; position: relative; z-index: 10; }
+    #sparkle-canvas { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
 
     .header {
       text-align: center;
       padding: 3.5rem 1rem 2rem;
       border-bottom: 0.5px solid #DDD3C5;
-      background: linear-gradient(180deg, #F5EFE4 0%, var(--cream) 100%);
+      background: linear-gradient(180deg, #F5EFE4 0%, var(--bg) 100%);
       position: relative;
     }
+    .header::before { content:'✦'; display:block; font-size:18px; color:var(--accent); margin-bottom:.5rem; letter-spacing:12px; }
+    .header h1 { font-family:'Cormorant Garamond',serif; font-size:40px; font-weight:300; letter-spacing:3px; color:var(--dark); line-height:1.2; }
+    .header h1 em { font-style:italic; color:var(--accent-dark); font-weight:400; }
+    .header .subtitle { font-size:12px; letter-spacing:4px; text-transform:uppercase; color:var(--muted); margin-top:8px; font-weight:400; }
+    .header .event-date { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--muted); margin-top:10px; font-style:italic; }
+    .ornament { text-align:center; color:var(--accent-light); font-size:14px; letter-spacing:8px; margin:1.5rem 0; }
 
-    .header::before {
-      content: '✦';
-      display: block;
-      font-size: 18px;
-      color: var(--gold);
-      margin-bottom: 0.5rem;
-      letter-spacing: 12px;
-    }
+    .screen { display:none; padding:1.5rem 1.25rem; }
+    .screen.active { display:block; animation:fadeIn .5s ease-out; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-    .header h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 40px;
-      font-weight: 300;
-      letter-spacing: 3px;
-      color: var(--dark);
-      line-height: 1.2;
-    }
+    .search-section { max-width:500px; margin:0 auto; }
+    .search-label { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:300; text-align:center; color:var(--dark); margin-bottom:.4rem; }
+    .search-hint { font-size:13px; text-align:center; color:var(--muted); margin-bottom:1.5rem; font-weight:300; }
+    .search-box { position:relative; margin-bottom:1rem; }
+    .search-box input { width:100%; padding:14px 16px 14px 44px; border:.5px solid #C8BAA6; border-radius:4px; font-family:'Jost',sans-serif; font-size:15px; background:var(--surface); color:var(--dark); outline:none; transition:border-color .2s,box-shadow .2s; }
+    .search-box input:focus { border-color:var(--accent); box-shadow:0 0 8px rgba(201,168,76,.15); }
+    .search-box i { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:18px; }
+    .results-list { list-style:none; background:var(--surface); border:.5px solid #C8BAA6; border-radius:4px; overflow:hidden; max-height:280px; overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,.05); }
+    .results-list li { padding:14px 18px; border-bottom:.5px solid #EDE5D8; cursor:pointer; display:flex; align-items:center; justify-content:space-between; transition:background .15s; }
+    .results-list li:last-child { border-bottom:none; }
+    .results-list li:hover { background:#FAF5EC; }
+    .guest-name { font-size:15px; color:var(--dark); font-weight:500; }
+    .guest-table { font-size:12px; color:var(--muted); margin-top:2px; }
+    .guest-status { font-size:11px; padding:3px 10px; border-radius:20px; font-weight:500; letter-spacing:.5px; }
+    .status-pending { background:#F5EDE0; color:#8B6914; }
+    .status-confirmed { background:#E0EDD6; color:#3A6B20; }
+    .status-declined { background:#F5E0E0; color:#8B2020; }
+    .arrow-icon { color:var(--accent); font-size:16px; }
+    .no-results { padding:2.5rem 1rem; text-align:center; color:var(--muted); font-size:14px; font-style:italic; }
 
-    .header h1 em {
-      font-style: italic;
-      color: var(--gold-dark);
-      font-weight: 400;
-    }
+    .confirm-card { max-width:460px; margin:0 auto; background:var(--surface); border:.5px solid #C8BAA6; border-radius:6px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.04); }
+    .confirm-header { background:var(--header-bg); padding:1.75rem; text-align:center; }
+    .confirm-header .guest-label { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--accent-light); margin-bottom:6px; }
+    .confirm-header .guest-full-name { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; color:white; letter-spacing:1px; }
+    .confirm-header .guest-info { font-size:12px; color:#9B8E7E; margin-top:4px; }
+    .confirm-body { padding:1.75rem; }
+    .confirm-question { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:300; text-align:center; color:var(--dark); margin-bottom:1.5rem; }
+    .confirm-buttons { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1.5rem; }
+    .btn-confirm { padding:14px; border:.5px solid #C8BAA6; border-radius:4px; font-family:'Jost',sans-serif; font-size:14px; font-weight:500; cursor:pointer; transition:all .2s; letter-spacing:1px; background:var(--surface); color:var(--dark); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-yes { border-color:#8BA86B; color:#3A6B20; }
+    .btn-no { border-color:#C4958E; color:#8B2020; }
+    .btn-yes:hover,.btn-yes.selected { background:#8BA86B; color:white; border-color:#8BA86B; box-shadow:0 4px 10px rgba(139,168,107,.25); }
+    .btn-no:hover,.btn-no.selected { background:var(--rose); color:white; border-color:var(--rose); box-shadow:0 4px 10px rgba(212,132,122,.25); }
+    .dietary-section { margin-top:1rem; }
+    .field-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; display:block; font-weight:500; }
+    .dietary-section input,.dietary-section select,.guests-count select { width:100%; padding:12px 14px; border:.5px solid #C8BAA6; border-radius:4px; font-family:'Jost',sans-serif; font-size:14px; background:var(--surface); color:var(--dark); outline:none; transition:border-color .2s; }
+    .dietary-section input:focus,.dietary-section select:focus,.guests-count select:focus { border-color:var(--accent); }
+    .guests-count { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:1rem; }
+    .btn-submit { width:100%; padding:15px; background:var(--dark); color:white; border:none; border-radius:4px; font-family:'Jost',sans-serif; font-size:13px; letter-spacing:3px; text-transform:uppercase; cursor:pointer; margin-top:1.25rem; transition:background .2s,transform .1s; font-weight:500; }
+    .btn-submit:hover { background:#2D2620; }
+    .btn-submit:active { transform:scale(.99); }
+    .btn-back { background:none; border:none; color:var(--muted); font-family:'Jost',sans-serif; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px; padding:0; margin-bottom:1.5rem; transition:color .15s; }
+    .btn-back:hover { color:var(--dark); }
 
-    .header .subtitle {
-      font-size: 12px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 8px;
-      font-weight: 400;
-    }
-
-    .header .event-date {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 16px;
-      color: var(--muted);
-      margin-top: 10px;
-      font-style: italic;
-    }
-
-    .ornament {
-      text-align: center;
-      color: var(--gold-light);
-      font-size: 14px;
-      letter-spacing: 8px;
-      margin: 1.5rem 0;
-    }
-
-    .screen { 
-      display: none; 
-      padding: 1.5rem 1.25rem; 
-    }
+    .qr-card { max-width:420px; margin:0 auto; text-align:center; }
+    .qr-success { display:flex; align-items:center; justify-content:center; gap:8px; background:#EAF3DE; border-radius:4px; padding:12px 18px; margin-bottom:1.5rem; font-size:14px; color:#3A6B20; font-weight:500; border:.5px solid rgba(58,107,32,.15); }
+    .qr-wrapper { background:var(--surface); border:.5px solid #C8BAA6; border-radius:6px; padding:1.75rem; margin-bottom:1.5rem; box-shadow:0 4px 15px rgba(0,0,0,.03); }
+    .qr-name { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:300; color:var(--dark); margin-bottom:4px; }
+    .qr-event-name { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:1.5rem; font-weight:400; }
+    .qr-detail { font-size:13px; color:var(--muted); display:flex; justify-content:space-between; padding:8px 0; border-top:.5px solid #EDE5D8; }
+    .qr-detail span:last-child { color:var(--dark); font-weight:500; }
+    .download-btn { width:100%; padding:14px; background:var(--accent-dark); color:white; border:none; border-radius:4px; font-family:'Jost',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .2s,transform .15s; font-weight:500; }
+    .download-btn:hover { filter:brightness(0.85); }
+    .download-btn:active { transform:scale(.99); }
+    .hint-save { font-size:12px; color:var(--muted); margin-top:12px; font-style:italic; }
     
-    .screen.active { 
-      display: block; 
-      animation: fadeIn 0.5s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .search-section { 
-      max-width: 500px; 
-      margin: 0 auto; 
-    }
-
-    .search-label {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 24px;
-      font-weight: 300;
-      text-align: center;
-      color: var(--dark);
-      margin-bottom: 0.4rem;
-    }
-
-    .search-hint {
-      font-size: 13px;
-      text-align: center;
-      color: var(--muted);
-      margin-bottom: 1.5rem;
-      font-weight: 300;
-    }
-
-    .search-box {
-      position: relative;
-      margin-bottom: 1rem;
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 14px 16px 14px 44px;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 15px;
-      background: white;
-      color: var(--dark);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .search-box input:focus { 
-      border-color: var(--gold); 
-      box-shadow: 0 0 8px rgba(201, 168, 76, 0.15);
-    }
-
-    .search-box i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 18px;
-    }
-
-    .results-list {
-      list-style: none;
-      background: white;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 4px;
-      overflow: hidden;
-      max-height: 280px;
-      overflow-y: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    .results-list li {
-      padding: 14px 18px;
-      border-bottom: 0.5px solid #EDE5D8;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background 0.15s;
-    }
-
-    .results-list li:last-child { 
-      border-bottom: none; 
-    }
-    
-    .results-list li:hover { 
-      background: #FAF5EC; 
-    }
-
-    .guest-name {
-      font-size: 15px;
-      color: var(--dark);
-      font-weight: 500;
-    }
-
-    .guest-table {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .guest-status {
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    .status-pending { background: #F5EDE0; color: #8B6914; }
-    .status-confirmed { background: #E0EDD6; color: #3A6B20; }
-    .status-declined { background: #F5E0E0; color: #8B2020; }
-
-    .arrow-icon { 
-      color: var(--gold); 
-      font-size: 16px; 
-    }
-
-    .no-results {
-      padding: 2.5rem 1rem;
-      text-align: center;
-      color: var(--muted);
-      font-size: 14px;
-      font-style: italic;
-    }
-
-    .confirm-card {
-      max-width: 460px;
-      margin: 0 auto;
-      background: white;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-    }
-
-    .confirm-header {
-      background: #1A1612;
-      padding: 1.75rem;
-      text-align: center;
-    }
-
-    .confirm-header .guest-label {
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--gold-light);
-      margin-bottom: 6px;
-    }
-
-    .confirm-header .guest-full-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      font-weight: 300;
-      color: white;
-      letter-spacing: 1px;
-    }
-
-    .confirm-header .guest-info {
-      font-size: 12px;
-      color: #9B8E7E;
-      margin-top: 4px;
-    }
-
-    .confirm-body { 
-      padding: 1.75rem; 
-    }
-
-    .confirm-question {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 300;
-      text-align: center;
-      color: var(--dark);
-      margin-bottom: 1.5rem;
-    }
-
-    .confirm-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 1.5rem;
-    }
-
-    .btn-confirm {
-      padding: 14px;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 1px;
-      background: white;
-      color: var(--dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-yes { border-color: #8BA86B; color: #3A6B20; }
-    .btn-no { border-color: #C4958E; color: #8B2020; }
-
-    .btn-yes:hover, .btn-yes.selected { 
-      background: #8BA86B; 
-      color: white; 
-      border-color: #8BA86B; 
-      box-shadow: 0 4px 10px rgba(139, 168, 107, 0.25);
-    }
-    
-    .btn-no:hover, .btn-no.selected { 
-      background: var(--rose); 
-      color: white; 
-      border-color: var(--rose); 
-      box-shadow: 0 4px 10px rgba(212, 132, 122, 0.25);
-    }
-
-    .dietary-section {
-      margin-top: 1rem;
-    }
-
-    .field-label {
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-      display: block;
-      font-weight: 500;
-    }
-
-    .dietary-section input, .dietary-section select, .guests-count select {
-      width: 100%;
-      padding: 12px 14px;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 14px;
-      background: white;
-      color: var(--dark);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .dietary-section input:focus, .dietary-section select:focus, .guests-count select:focus {
-      border-color: var(--gold);
-    }
-
-    .guests-count {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 1rem;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 15px;
-      background: var(--dark);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 13px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      cursor: pointer;
-      margin-top: 1.25rem;
-      transition: background 0.2s, transform 0.1s;
-      font-weight: 500;
-    }
-
-    .btn-submit:hover { 
-      background: #2D2620; 
-    }
-    
-    .btn-submit:active {
-      transform: scale(0.99);
-    }
-
-    .btn-back {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-family: 'Jost', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0;
-      margin-bottom: 1.5rem;
-      transition: color 0.15s;
-    }
-
-    .btn-back:hover {
-      color: var(--dark);
-    }
-
-    .qr-card {
-      max-width: 420px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .qr-success {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: #EAF3DE;
-      border-radius: 4px;
-      padding: 12px 18px;
-      margin-bottom: 1.5rem;
-      font-size: 14px;
-      color: #3A6B20;
-      font-weight: 500;
-      border: 0.5px solid rgba(58, 107, 32, 0.15);
-    }
-
-    .qr-wrapper {
-      background: white;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 6px;
-      padding: 1.75rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-    }
-
-    .qr-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 300;
-      color: var(--dark);
-      margin-bottom: 4px;
-    }
-
-    .qr-event-name {
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 1.5rem;
-      font-weight: 400;
-    }
-
-    #qr-canvas {
-      display: block;
-      margin: 0 auto 1.5rem;
-      border: 0.5px solid #EDE5D8;
-      border-radius: 4px;
-      padding: 10px;
-      background: white;
-    }
-
-    .qr-detail {
-      font-size: 13px;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-top: 0.5px solid #EDE5D8;
-    }
-
-    .qr-detail span:last-child { 
-      color: var(--dark); 
-      font-weight: 500; 
-    }
-
-    .download-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--gold-dark);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background 0.2s, transform 0.15s;
-      font-weight: 500;
-    }
-
-    .download-btn:hover { 
-      background: #6B4E10; 
-    }
-
-    .download-btn:active {
-      transform: scale(0.99);
-    }
-
-    .hint-save {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 12px;
-      font-style: italic;
-    }
-
-    .declined-card {
-      max-width: 400px;
-      margin: 0 auto;
-      text-align: center;
-      padding: 3rem 1.5rem;
-      background: white;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 6px;
-    }
-
-    .declined-icon { 
-      font-size: 44px; 
-      color: #C4958E; 
-      margin-bottom: 1.25rem; 
-    }
-
-    .declined-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      font-weight: 300;
-      color: var(--dark);
-      margin-bottom: 10px;
-    }
-
-    .declined-msg { 
-      font-size: 14px; 
-      color: var(--muted); 
-      line-height: 1.6; 
-      margin-bottom: 1.5rem;
-    }
-
-    .admin-toggle {
-      text-align: center;
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 0.5px solid #DDD3C5;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
-
-    .admin-link {
-      font-size: 12px;
-      color: #B4A48C;
-      letter-spacing: 1px;
-      cursor: pointer;
-      text-decoration: none;
-      border: none;
-      background: none;
-      font-family: 'Jost', sans-serif;
-      transition: color 0.15s;
-    }
-
-    .admin-link:hover {
-      color: var(--gold-dark);
-    }
-
-    .admin-panel {
-      background: white;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 6px;
-      overflow: hidden;
-      margin-top: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-    }
-
-    .admin-head {
-      background: #F5EFE4;
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 0.5px solid #DDD3C5;
-    }
-
-    .admin-head h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--dark);
-    }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-      border-bottom: 0.5px solid #EDE5D8;
-    }
-
-    .stat-cell {
-      padding: 1.25rem 1rem;
-      text-align: center;
-      border-right: 0.5px solid #EDE5D8;
-    }
-
-    .stat-cell:last-child { 
-      border-right: none; 
-    }
-
-    .stat-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 32px;
-      font-weight: 300;
-      line-height: 1.1;
-    }
-
-    .stat-num.gold { color: var(--gold-dark); }
-    .stat-num.green { color: #4A7A28; }
-    .stat-num.rose { color: var(--rose); }
-
-    .stat-lbl { 
-      font-size: 11px; 
-      letter-spacing: 1.5px; 
-      text-transform: uppercase; 
-      color: var(--muted); 
-      margin-top: 4px;
-      font-weight: 500;
-    }
-
-    .admin-list { 
-      max-height: 320px; 
-      overflow-y: auto; 
-    }
-
-    .admin-row {
-      display: flex;
-      align-items: center;
-      padding: 12px 1.5rem;
-      border-bottom: 0.5px solid #F0E8DC;
-      gap: 12px;
-    }
-
-    .admin-row:last-child { 
-      border-bottom: none; 
-    }
-
-    .admin-name { 
-      flex: 1; 
-      font-size: 14px; 
-      text-align: left;
-      font-weight: 500;
-    }
-    
-    .admin-table { 
-      font-size: 12px; 
-      color: var(--muted); 
-      width: 90px; 
-      text-align: left;
-    }
-
-    .badge {
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-
-    .badge-p { background: #F5EDE0; color: #8B6914; }
-    .badge-c { background: #E0EDD6; color: #3A6B20; }
-    .badge-d { background: #F5E0E0; color: #8B2020; }
-
-    .add-guest-row {
-      padding: 1.25rem 1.5rem;
-      border-top: 0.5px solid #DDD3C5;
-      display: flex;
-      gap: 10px;
-      background: #FAF8F5;
-      flex-wrap: wrap;
-    }
-
-    .add-guest-row input {
-      flex: 1;
-      min-width: 120px;
-      padding: 10px 12px;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 13px;
-      background: white;
-      color: var(--dark);
-      outline: none;
-    }
-
-    .add-guest-row input:focus {
-      border-color: var(--gold);
-    }
-
-    .btn-add {
-      padding: 10px 18px;
-      background: var(--dark);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.15s;
-    }
-
-    .btn-add:hover { 
-      background: #2D2620; 
-    }
-
-    .settings-row {
-      padding: 1.25rem 1.5rem;
-      border-top: 0.5px solid #DDD3C5;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      background: #FAF8F5;
-      flex-wrap: wrap;
-    }
-
-    .settings-row input {
-      flex: 1;
-      min-width: 140px;
-      padding: 10px 12px;
-      border: 0.5px solid #C8BAA6;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 13px;
-      background: white;
-      color: var(--dark);
-      outline: none;
-    }
-
-    .settings-row input:focus {
-      border-color: var(--gold);
-    }
-
-    .settings-row label { 
-      font-size: 13px; 
-      color: var(--muted); 
-      white-space: nowrap; 
-      font-weight: 500;
-    }
-
-    .btn-save-settings {
-      padding: 10px 18px;
-      background: var(--gold-dark);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-
-    .btn-save-settings:hover {
-      background: #6B4E10;
-    }
-
-    /* Elegant Custom Notification Toast */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 100;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      background: #1A1612;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 6px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      border: 1px solid rgba(201, 168, 76, 0.3);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      pointer-events: none;
-    }
-
-    #toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    #toast i {
-      color: var(--gold-light);
-      font-size: 18px;
-    }
-
-    /* Passcode Lock Screen Modal */
-    .admin-modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(26, 22, 18, 0.6);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .admin-modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .admin-modal-box {
-      background: white;
-      border: 1px solid var(--gold);
-      border-radius: 8px;
-      width: 90%;
-      max-width: 380px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-      transform: scale(0.9);
-      transition: transform 0.3s ease;
-    }
-
-    .admin-modal-overlay.active .admin-modal-box {
-      transform: scale(1);
-    }
-
-    .pin-input-container {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin: 1.5rem 0;
-    }
-
-    .pin-digit {
-      width: 50px;
-      height: 50px;
-      border: 1px solid #C8BAA6;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--dark);
-      background: #FAF7F2;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .pin-digit:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 5px rgba(201, 168, 76, 0.3);
-    }
-
-    /* Custom Confirm Modal styling */
-    .confirm-modal-box {
-      background: white;
-      border: 1px solid #C4958E;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 380px;
-      padding: 1.75rem;
-      text-align: center;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-      transform: scale(0.9);
-      transition: transform 0.3s ease;
-    }
+    #qr-container { width:180px; height:180px; margin:0 auto 1.5rem; display:flex; align-items:center; justify-content:center; }
+    #qr-container img, #qr-container canvas { max-width:100%; max-height:100%; display:block; }
+
+    .declined-card { max-width:400px; margin:0 auto; text-align:center; padding:3rem 1.5rem; background:var(--surface); border:.5px solid #C8BAA6; border-radius:6px; }
+    .declined-icon { font-size:44px; color:#C4958E; margin-bottom:1.25rem; }
+    .declined-title { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; color:var(--dark); margin-bottom:10px; }
+    .declined-msg { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:1.5rem; }
+
+    .admin-toggle { text-align:center; margin-top:3rem; padding-top:2rem; border-top:.5px solid #DDD3C5; max-width:760px; margin-left:auto; margin-right:auto; padding-left:1rem; padding-right:1rem; }
+    .admin-link { font-size:12px; color:#B4A48C; letter-spacing:1px; cursor:pointer; text-decoration:none; border:none; background:none; font-family:'Jost',sans-serif; transition:color .15s; }
+    .admin-link:hover { color:var(--accent-dark); }
+    .admin-panel { background:var(--surface); border:.5px solid #C8BAA6; border-radius:6px; overflow:hidden; margin-top:1.5rem; box-shadow:0 4px 15px rgba(0,0,0,.03); }
+    .admin-head { background:#F5EFE4; padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between; border-bottom:.5px solid #DDD3C5; }
+    .admin-head h3 { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:500; color:var(--dark); }
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-bottom:.5px solid #EDE5D8; }
+    .stat-cell { padding:1.25rem .5rem; text-align:center; border-right:.5px solid #EDE5D8; }
+    .stat-cell:last-child { border-right:none; }
+    .stat-num { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; line-height:1.1; }
+    .stat-num.gold { color:var(--accent-dark); }
+    .stat-num.green { color:#4A7A28; }
+    .stat-num.rose { color:var(--rose); }
+    .stat-num.indigo { color:#4F46E5; }
+    .stat-lbl { font-size:10px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); margin-top:4px; font-weight:500; }
+    .admin-list { max-height:350px; overflow-y:auto; }
+    .admin-row { display:flex; align-items:center; padding:12px 1.5rem; border-bottom:.5px solid #F0E8DC; gap:12px; }
+    .admin-row:last-child { border-bottom:none; }
+    .admin-name { flex:1; font-size:14px; text-align:left; font-weight:500; }
+    .admin-table { font-size:12px; color:var(--muted); width:90px; text-align:left; }
+    .badge { font-size:11px; padding:3px 10px; border-radius:20px; font-weight:500; }
+    .badge-p { background:#F5EDE0; color:#8B6914; }
+    .badge-c { background:#E0EDD6; color:#3A6B20; }
+    .badge-d { background:#F5E0E0; color:#8B2020; }
+
+    .add-guest-row { padding:1.25rem 1.5rem; border-top:.5px solid #DDD3C5; display:flex; gap:10px; background:#FAF8F5; flex-wrap:wrap; }
+    .add-guest-row input { flex:1; min-width:120px; padding:10px 12px; border:.5px solid #C8BAA6; border-radius:4px; font-family:'Jost',sans-serif; font-size:13px; background:var(--surface); color:var(--dark); outline:none; }
+    .add-guest-row input:focus { border-color:var(--accent); }
+    .btn-add { padding:10px 18px; background:var(--dark); color:white; border:none; border-radius:4px; font-family:'Jost',sans-serif; font-size:13px; cursor:pointer; white-space:nowrap; transition:background .15s; }
+    .btn-add:hover { background:#2D2620; }
+
+    .settings-section { padding:1.25rem 1.5rem; border-top:.5px solid #DDD3C5; background:#FAF8F5; }
+    .settings-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:12px; }
+    .settings-field { display:flex; flex-direction:column; gap:4px; }
+    .settings-field label { font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); font-weight:500; }
+    .settings-field input, .settings-field select { padding:9px 12px; border:.5px solid #C8BAA6; border-radius:4px; font-family:'Jost',sans-serif; font-size:13px; background:var(--surface); color:var(--dark); outline:none; }
+    .settings-field input:focus,.settings-field select:focus { border-color:var(--accent); }
+    .settings-field input[type=color] { padding:4px 6px; height:36px; cursor:pointer; }
+    .btn-save-settings { padding:10px 18px; background:var(--accent-dark); color:white; border:none; border-radius:4px; font-family:'Jost',sans-serif; font-size:13px; cursor:pointer; transition:background .15s; }
+    .btn-save-settings:hover { filter:brightness(.85); }
+
+    #toast { position:fixed; bottom:24px; right:24px; z-index:10000; transform:translateY(100px); opacity:0; transition:all .35s cubic-bezier(.175,.885,.32,1.275); background:#1A1612; color:white; padding:12px 20px; border-radius:6px; box-shadow:0 10px 25px rgba(0,0,0,.15); border:1px solid rgba(201,168,76,.3); display:flex; align-items:center; gap:10px; font-size:13px; pointer-events:none; }
+    #toast.show { transform:translateY(0); opacity:1; }
+    #toast i { color:var(--accent-light); font-size:18px; }
+
+    .admin-modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(26,22,18,.6); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .3s; }
+    .admin-modal-overlay.active { opacity:1; pointer-events:auto; }
+    .admin-modal-box { background:var(--surface); border:1px solid var(--accent); border-radius:8px; width:90%; max-width:380px; padding:2rem; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,.2); transform:scale(.9); transition:transform .3s; }
+    .admin-modal-overlay.active .admin-modal-box { transform:scale(1); }
+    .pin-input-container { display:flex; justify-content:center; gap:12px; margin:1.5rem 0; }
+    .pin-digit { width:50px; height:50px; border:1px solid #C8BAA6; border-radius:6px; text-align:center; font-size:24px; font-weight:600; color:var(--dark); background:#FAF7F2; outline:none; transition:border-color .2s,box-shadow .2s; }
+    .pin-digit:focus { border-color:var(--accent); box-shadow:0 0 5px rgba(201,168,76,.3); }
+    .confirm-modal-box { background:var(--surface); border:1px solid #C4958E; border-radius:8px; width:90%; max-width:380px; padding:1.75rem; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,.2); transform:scale(.9); transition:transform .3s; }
+    #qr-scanner-container { display:none; background:#FAF7F2; border:1px dashed var(--accent); border-radius:6px; padding:1rem; margin-bottom:1.5rem; text-align:center; }
+
+    /* Color theme preview swatches */
+    .theme-presets { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .theme-swatch { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .15s,border-color .15s; }
+    .theme-swatch:hover,.theme-swatch.active { transform:scale(1.15); border-color:var(--dark); }
   </style>
-
-  <!-- Safe defensive configuration of Tailwind to prevent any script failures -->
-  <script>
-    if (typeof tailwind !== 'undefined') {
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              gold: {
-                DEFAULT: '#C9A84C',
-                light: '#E8D5A3',
-                dark: '#8B6914',
-              },
-              cream: {
-                DEFAULT: '#FAF7F2',
-                dark: '#EDE5D8',
-              },
-              dark: '#1A1612',
-              muted: '#6B5E4E',
-              rose: '#D4847A',
-            }
-          }
-        }
-      }
-    }
-  </script>
 </head>
 <body>
 
-  <!-- Premium Sparkle Background -->
-  <canvas id="sparkle-canvas"></canvas>
+<canvas id="sparkle-canvas"></canvas>
 
-  <!-- Application Shell -->
-  <div id="app">
-    <div class="header">
-      <h1><em>Sofía</em> &amp; <em>Mateo</em></h1>
-      <p class="subtitle" id="header-subtitle">Confirmación de asistencia</p>
-      <p class="event-date" id="header-date">Sábado, 14 de febrero de 2026 · 19:00 hrs</p>
-    </div>
+<div id="app">
+  <div class="header">
+    <h1><em id="name-bride">Sofía</em> &amp; <em id="name-groom">Mateo</em></h1>
+    <p class="subtitle" id="header-subtitle">Confirmación de asistencia</p>
+    <p class="event-date" id="header-date">Sábado, 14 de febrero de 2026 · 19:00 hrs</p>
+  </div>
+  <div class="ornament">· · ✦ · ·</div>
 
-    <div class="ornament">· · ✦ · ·</div>
-
-    <!-- SCREEN 1: SEARCH PORTAL -->
-    <div id="screen-search" class="screen active">
-      <div class="search-section">
-        <p class="search-label">Busca tu nombre</p>
-        <p class="search-hint">Escribe tu nombre para encontrar tu invitación</p>
-        <div class="search-box">
-          <i class="ti ti-search" aria-hidden="true"></i>
-          <input type="text" id="search-input" placeholder="Ej. María García..." autocomplete="off" />
-        </div>
-        <ul class="results-list" id="results-list" style="display:none"></ul>
+  <!-- SCREEN 1: SEARCH -->
+  <div id="screen-search" class="screen active">
+    <div class="search-section">
+      <p class="search-label">Busca tu nombre</p>
+      <p class="search-hint">Escribe al menos 3 letras para encontrar tu invitación</p>
+      <div class="search-box">
+        <i class="ti ti-search"></i>
+        <input type="text" id="search-input" placeholder="Ej. María García..." autocomplete="off" />
       </div>
+      <ul class="results-list" id="results-list" style="display:none"></ul>
     </div>
+  </div>
 
-    <!-- SCREEN 2: RSVP FORM -->
-    <div id="screen-confirm" class="screen">
-      <div class="confirm-card">
-        <div class="confirm-header">
-          <p class="guest-label">Invitado</p>
-          <p class="guest-full-name" id="cf-name">—</p>
-          <p class="guest-info" id="cf-table">—</p>
-        </div>
-        <div class="confirm-body">
-          <button class="btn-back" onclick="showScreen('search')">
-            <i class="ti ti-arrow-left" aria-hidden="true"></i> Volver a buscar
+  <!-- SCREEN 2: RSVP FORM -->
+  <div id="screen-confirm" class="screen">
+    <div class="confirm-card">
+      <div class="confirm-header">
+        <p class="guest-label">Invitado</p>
+        <p class="guest-full-name" id="cf-name">—</p>
+        <!-- Fix #4: mesa y pases NO se muestran en la vista de búsqueda al invitado -->
+      </div>
+      <div class="confirm-body">
+        <button class="btn-back" onclick="showScreen('search')">
+          <i class="ti ti-arrow-left"></i> Volver a buscar
+        </button>
+        <p class="confirm-question">¿Confirmas tu asistencia?</p>
+        <div class="confirm-buttons">
+          <button class="btn-confirm btn-yes" id="btn-yes" onclick="selectAttending(true)">
+            <i class="ti ti-check"></i> Sí, asistiré
           </button>
-          
-          <p class="confirm-question">¿Confirmas tu asistencia?</p>
-          
-          <div class="confirm-buttons">
-            <button class="btn-confirm btn-yes" id="btn-yes" onclick="selectAttending(true)">
-              <i class="ti ti-check" aria-hidden="true"></i> Sí, asistiré
-            </button>
-            <button class="btn-confirm btn-no" id="btn-no" onclick="selectAttending(false)">
-              <i class="ti ti-x" aria-hidden="true"></i> No podré ir
-            </button>
-          </div>
-          
-          <!-- Allowed Passes Badge -->
-          <div id="pases-badge" class="hidden mb-4 p-3 bg-[#FAF5EC] border border-[#E8D5A3] rounded-md text-center text-sm font-medium text-[#8B6914] flex items-center justify-center gap-2">
-            <i class="ti ti-ticket" aria-hidden="true"></i>
-            <span>Tienes <strong id="pases-limite">0</strong> pases asignados en total</span>
-          </div>
-          
-          <div id="yes-fields" style="display:none">
-            <div class="guests-count">
-              <div>
-                <label class="field-label">Adultos</label>
-                <select id="adults-count" onchange="validatePassLimit()">
-                  <!-- Dynamic generation based on limit -->
-                </select>
-              </div>
-              <div>
-                <label class="field-label">Niños</label>
-                <select id="kids-count" onchange="validatePassLimit()">
-                  <!-- Dynamic generation based on limit -->
-                </select>
-              </div>
-            </div>
-            <div class="dietary-section">
-              <label class="field-label">Restricción alimentaria (opcional)</label>
-              <input type="text" id="dietary" placeholder="Ej. vegetariano, sin gluten..." />
-            </div>
-            
-            <!-- Warning badge when limit exceeded -->
-            <div id="limit-warning" class="hidden mt-3 p-2 bg-[#F5E0E0] border border-[#C4958E] rounded text-xs text-[#8B2020] text-center font-medium">
-              El total de personas excede tus pases asignados.
-            </div>
-          </div>
-          
-          <button class="btn-submit" id="btn-submit" onclick="submitConfirmation()" style="display:none">
-            Confirmar Respuesta
+          <button class="btn-confirm btn-no" id="btn-no" onclick="selectAttending(false)">
+            <i class="ti ti-x"></i> No podré ir
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- SCREEN 3: CONFIRMED QR TICKET -->
-    <div id="screen-qr" class="screen">
-      <div class="qr-card">
-        <div class="qr-success">
-          <i class="ti ti-circle-check-filled" aria-hidden="true"></i>
-          ¡Asistencia confirmada con éxito!
+        <div id="pases-badge" class="hidden mb-4 p-3 rounded-md text-center text-sm font-medium flex items-center justify-center gap-2" style="background:#FAF5EC;border:.5px solid #E8D5A3;color:#8B6914;">
+          <i class="ti ti-ticket"></i>
+          <span>Tienes <strong id="pases-limite">0</strong> pases asignados</span>
         </div>
-        <div class="qr-wrapper">
-          <p class="qr-name" id="qr-name">—</p>
-          <p class="qr-event-name" id="qr-event-label">Boda · 14 Feb 2026</p>
-          <canvas id="qr-canvas" width="180" height="180"></canvas>
-          <div class="qr-detail">
-            <span>Mesa asignada</span>
-            <span id="qr-table-info">—</span>
+        <div id="yes-fields" style="display:none">
+          <div class="guests-count">
+            <div>
+              <label class="field-label">Adultos</label>
+              <select id="adults-count" onchange="validatePassLimit()"></select>
+            </div>
+            <div>
+              <label class="field-label">Niños</label>
+              <select id="kids-count" onchange="validatePassLimit()"></select>
+            </div>
           </div>
-          <div class="qr-detail">
-            <span>Boletos autorizados</span>
-            <span id="qr-pax">—</span>
+          <div class="dietary-section">
+            <label class="field-label">Restricción alimentaria (opcional)</label>
+            <input type="text" id="dietary" placeholder="Ej. vegetariano, sin gluten..." />
           </div>
-          <div class="qr-detail">
-            <span>Código de Acceso</span>
-            <span id="qr-code-text" style="font-family:monospace; font-weight:600; color:var(--gold-dark);">—</span>
+          <div id="limit-warning" class="hidden mt-3 p-2 rounded text-xs text-center font-medium" style="background:#F5E0E0;border:.5px solid #C4958E;color:#8B2020;">
+            El total de personas excede tus pases asignados.
           </div>
         </div>
-        <button class="download-btn" onclick="downloadQR()">
-          <i class="ti ti-download" aria-hidden="true"></i>
-          Descargar Pase Digital
-        </button>
-        <p class="hint-save">Guarda esta imagen para presentarla en la entrada del evento</p>
-        
-        <button class="mt-6 text-xs text-muted hover:text-dark underline block mx-auto cursor-pointer" onclick="showScreen('search')">
-          Volver al Inicio
+        <button class="btn-submit" id="btn-submit" onclick="submitConfirmation()" style="display:none">
+          Confirmar Respuesta
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- SCREEN 4: DECLINED RESPONSE -->
-    <div id="screen-declined" class="screen">
-      <div class="declined-card">
-        <div class="declined-icon"><i class="ti ti-heart-off" aria-hidden="true"></i></div>
-        <p class="declined-title">Lamentamos que no puedas ir</p>
-        <p class="declined-msg">Hemos registrado que no podrás asistir. Te extrañaremos mucho y agradecemos enormemente tu oportuna respuesta.</p>
-        <button class="btn-submit" onclick="showScreen('search')">
-          Volver al Buscador
-        </button>
+  <!-- SCREEN 3: QR TICKET -->
+  <div id="screen-qr" class="screen">
+    <div class="qr-card">
+      <div class="qr-success">
+        <i class="ti ti-circle-check-filled"></i>
+        ¡Asistencia confirmada con éxito!
       </div>
-    </div>
-
-    <!-- SCREEN 5: CONTROL PANEL (ADMIN) -->
-    <div class="admin-toggle">
-      <button class="admin-link flex items-center justify-center gap-1 mx-auto" onclick="toggleAdmin()">
-        <i id="admin-lock-icon" class="ti ti-lock" aria-hidden="true"></i> 
-        <span>Panel de Administración</span>
+      <div class="qr-wrapper">
+        <p class="qr-name" id="qr-name">—</p>
+        <p class="qr-event-name" id="qr-event-label">Boda · 14 Feb 2026</p>
+        <div id="qr-container"></div>
+        <div class="qr-detail"><span>Mesa asignada</span><span id="qr-table-info">—</span></div>
+        <div class="qr-detail"><span>Boletos autorizados</span><span id="qr-pax">—</span></div>
+        <div class="qr-detail"><span>Código de Acceso</span><span id="qr-code-text" style="font-family:monospace;font-weight:600;color:var(--accent-dark);">—</span></div>
+      </div>
+      <button class="download-btn" onclick="downloadQR()">
+        <i class="ti ti-download"></i> Descargar Pase Digital
       </button>
-      
-      <div id="admin-section" style="display:none" class="relative mt-4">
-        <!-- Close Session button -->
-        <div class="text-right mb-2">
-          <button class="text-xs bg-dark text-white hover:bg-red-800 px-3 py-1 rounded transition-colors" onclick="logoutAdmin()">
-            <i class="ti ti-logout"></i> Cerrar Sesión Admin
+      <p class="hint-save">Guarda esta imagen para presentarla en la entrada del evento</p>
+      <button style="margin-top:1.5rem;font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;display:block;margin-left:auto;margin-right:auto;" onclick="showScreen('search')">Volver al Inicio</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: DECLINED -->
+  <div id="screen-declined" class="screen">
+    <div class="declined-card">
+      <div class="declined-icon"><i class="ti ti-heart-off"></i></div>
+      <p class="declined-title">Lamentamos que no puedas ir</p>
+      <p class="declined-msg">Hemos registrado que no podrás asistir. Te extrañaremos mucho y agradecemos tu oportuna respuesta.</p>
+      <button class="btn-submit" onclick="showScreen('search')">Volver al Buscador</button>
+    </div>
+  </div>
+
+  <!-- ADMIN TOGGLE -->
+  <div class="admin-toggle">
+    <button class="admin-link flex items-center justify-center gap-1 mx-auto" onclick="toggleAdmin()">
+      <i id="admin-lock-icon" class="ti ti-lock"></i>
+      <span>Panel de Administración</span>
+    </button>
+
+    <div id="admin-section" style="display:none" class="relative mt-4">
+      <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+        <button style="font-size:12px;background:var(--accent-dark);color:white;padding:6px 12px;border-radius:4px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Jost',sans-serif;" onclick="toggleQRReader()">
+          <i class="ti ti-camera"></i> Escanear Pase (QR)
+        </button>
+        <button style="font-size:12px;background:var(--dark);color:white;padding:6px 12px;border-radius:4px;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Jost',sans-serif;" onclick="logoutAdmin()">
+          <i class="ti ti-logout"></i> Cerrar Sesión
+        </button>
+      </div>
+
+      <!-- QR Scanner -->
+      <div id="qr-scanner-container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;font-weight:600;color:#8B6914;text-transform:uppercase;letter-spacing:1px;">Escáner de Accesos</span>
+          <button style="font-size:12px;color:var(--rose);background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;" onclick="toggleQRReader(false)">Apagar Cámara</button>
+        </div>
+        <div id="reader" style="width:100%;max-width:380px;margin:0 auto;overflow:hidden;border-radius:6px;"></div>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px;font-style:italic;">Apunta con la cámara al código QR del pase del invitado.</p>
+      </div>
+
+      <!-- Settings Panel -->
+      <div class="settings-section">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--dark);margin-bottom:12px;">⚙ Configuración del Evento</p>
+        <div class="settings-grid">
+          <div class="settings-field">
+            <label>Nombre del Novio / Novia 1</label>
+            <input type="text" id="setting-bride" placeholder="Sofía" />
+          </div>
+          <div class="settings-field">
+            <label>Nombre del Novio / Novia 2</label>
+            <input type="text" id="setting-groom" placeholder="Mateo" />
+          </div>
+          <div class="settings-field">
+            <label>Nombre del Evento</label>
+            <input type="text" id="event-name-input" placeholder="Boda de Sofía &amp; Mateo" />
+          </div>
+          <div class="settings-field">
+            <label>Fecha y Hora</label>
+            <input type="text" id="event-date-input" placeholder="14 Feb 2026" />
+          </div>
+          <div class="settings-field">
+            <label>PIN Admin (4 dígitos)</label>
+            <input type="text" id="admin-pin-input" maxlength="4" class="font-bold tracking-widest text-center" />
+          </div>
+        </div>
+
+        <!-- Fix #6: Theme customization -->
+        <p style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:10px;margin-top:4px;">Diseño y Color del Sitio</p>
+        <div class="settings-grid">
+          <div class="settings-field">
+            <label>Color de Acento</label>
+            <input type="color" id="color-accent" value="#C9A84C" oninput="previewTheme()" />
+          </div>
+          <div class="settings-field">
+            <label>Color de Fondo</label>
+            <input type="color" id="color-bg" value="#FAF7F2" oninput="previewTheme()" />
+          </div>
+          <div class="settings-field">
+            <label>Color de Encabezado</label>
+            <input type="color" id="color-header" value="#1A1612" oninput="previewTheme()" />
+          </div>
+          <div class="settings-field">
+            <label>Color de Superficie</label>
+            <input type="color" id="color-surface" value="#FFFFFF" oninput="previewTheme()" />
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <p style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:8px;">Paletas Predefinidas</p>
+          <div class="theme-presets" id="theme-presets"></div>
+        </div>
+        <button class="btn-save-settings" onclick="saveSettings()">Guardar Cambios</button>
+      </div>
+
+      <div class="admin-panel">
+        <div class="admin-head">
+          <h3>Lista de Invitados</h3>
+          <button onclick="exportToCSV()" style="font-size:12px;background:white;border:.5px solid #DDD3C5;padding:6px 12px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Jost',sans-serif;font-weight:500;">
+            <i class="ti ti-file-export"></i> Exportar CSV
           </button>
         </div>
-
-        <div class="settings-row">
-          <div class="flex flex-col text-left mb-2 w-full sm:w-auto">
-            <label>Nombre del Evento:</label>
-            <input type="text" id="event-name-input" placeholder="Nombre del evento" value="Boda de Sofía & Mateo" />
-          </div>
-          <div class="flex flex-col text-left mb-2 w-full sm:w-auto">
-            <label>Fecha y Hora:</label>
-            <input type="text" id="event-date-input" placeholder="Fecha del evento" value="14 Feb 2026" />
-          </div>
-          <div class="flex flex-col text-left mb-2 w-full sm:w-auto">
-            <label>PIN de Acceso (4 dígitos):</label>
-            <input type="text" id="admin-pin-input" placeholder="Clave admin" maxlength="4" value="1402" class="font-bold tracking-widest text-center" />
-          </div>
-          <button class="btn-save-settings mt-3 sm:mt-auto" onclick="saveSettings()">Actualizar Datos</button>
+        <div class="stats-row">
+          <div class="stat-cell"><div class="stat-num gold" id="stat-total">0</div><div class="stat-lbl">Invitados</div></div>
+          <div class="stat-cell"><div class="stat-num green" id="stat-confirmed">0</div><div class="stat-lbl">Confirmados</div></div>
+          <div class="stat-cell"><div class="stat-num rose" id="stat-declined">0</div><div class="stat-lbl">Declinaron</div></div>
+          <div class="stat-cell"><div class="stat-num indigo" id="stat-checkedin">0</div><div class="stat-lbl">En Salón</div></div>
         </div>
-        
-        <div class="admin-panel">
-          <div class="admin-head">
-            <h3>Lista de Invitados</h3>
-            <button onclick="exportToCSV()" class="text-xs bg-white text-dark border border-cream-dark px-3 py-1.5 rounded hover:bg-cream transition-colors flex items-center gap-1.5 font-medium"><i class="ti ti-file-export"></i> Exportar CSV</button>
+        <div class="admin-list" id="admin-list"></div>
+        <!-- Fix #5: Mesa es opcional con checkbox -->
+        <div class="add-guest-row">
+          <input type="text" id="new-guest-name" placeholder="Nombre completo del invitado" />
+          <div style="display:flex;flex-direction:column;gap:4px;width:130px;flex:none;">
+            <label style="font-size:11px;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--muted);">
+              <input type="checkbox" id="use-table-toggle" onchange="toggleTableInput()" style="accent-color:var(--accent-dark);" checked />
+              Asignar mesa
+            </label>
+            <input type="text" id="new-guest-table" placeholder="Mesa 1" />
           </div>
-          <div class="stats-row">
-            <div class="stat-cell">
-              <div class="stat-num gold" id="stat-total">0</div>
-              <div class="stat-lbl">Invitados</div>
-            </div>
-            <div class="stat-cell">
-              <div class="stat-num green" id="stat-confirmed">0</div>
-              <div class="stat-lbl">Confirmados</div>
-            </div>
-            <div class="stat-cell">
-              <div class="stat-num rose" id="stat-declined">0</div>
-              <div class="stat-lbl">Declinaron</div>
-            </div>
+          <div style="display:flex;flex-direction:column;gap:4px;width:100px;flex:none;">
+            <label style="font-size:11px;color:var(--muted);letter-spacing:.5px;">Pases</label>
+            <input type="number" id="new-guest-passes" min="1" max="10" value="2" style="text-align:center;" />
           </div>
-          
-          <div class="admin-list" id="admin-list"></div>
-          
-          <div class="add-guest-row">
-            <input type="text" id="new-guest-name" placeholder="Nombre completo del invitado" />
-            <input type="text" id="new-guest-table" placeholder="Mesa asignada" style="width:120px; flex:none" />
-            <div class="flex items-center gap-2" style="width:140px; flex:none">
-              <span class="text-xs text-muted whitespace-nowrap">Pases:</span>
-              <input type="number" id="new-guest-passes" min="1" max="10" value="2" class="text-center" style="width:100%" />
-            </div>
-            <button class="btn-add" onclick="addGuest()"><i class="ti ti-plus" aria-hidden="true"></i> Agregar Invitado</button>
-          </div>
+          <button class="btn-add" onclick="addGuest()"><i class="ti ti-plus"></i> Agregar</button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- MODAL: Password Verification lock screen -->
-  <div id="admin-passcode-modal" class="admin-modal-overlay">
-    <div class="admin-modal-box">
-      <div class="text-[#8B6914] text-4xl mb-2"><i class="ti ti-lock-square-rounded"></i></div>
-      <h3 class="font-serif text-2xl text-dark font-semibold">Acceso de Administrador</h3>
-      <p class="text-xs text-muted mt-1">Introduce el PIN de 4 dígitos para acceder al panel de invitados.</p>
-      
-      <div class="pin-input-container">
-        <input type="password" id="pin-1" class="pin-digit" maxlength="1" oninput="stepPINInput(this, 1)" onkeydown="checkPINBackspace(event, 1)" autocomplete="off">
-        <input type="password" id="pin-2" class="pin-digit" maxlength="1" oninput="stepPINInput(this, 2)" onkeydown="checkPINBackspace(event, 2)" autocomplete="off">
-        <input type="password" id="pin-3" class="pin-digit" maxlength="1" oninput="stepPINInput(this, 3)" onkeydown="checkPINBackspace(event, 3)" autocomplete="off">
-        <input type="password" id="pin-4" class="pin-digit" maxlength="1" oninput="stepPINInput(this, 4)" onkeydown="checkPINBackspace(event, 4)" autocomplete="off">
-      </div>
-      
-      <p class="text-[10px] text-muted italic mb-4">Pista: El día de la boda DDMM (Ej. 14 de Febrero = 1402)</p>
-      
-      <div class="flex gap-2 justify-center">
-        <button class="px-4 py-2 text-xs border border-[#C8BAA6] rounded text-muted hover:text-dark" onclick="closeAdminModal()">Cancelar</button>
-        <button class="px-5 py-2 text-xs bg-dark text-white rounded hover:bg-[#2D2620]" onclick="verifyAdminPIN()">Verificar Clave</button>
-      </div>
+<!-- MODAL: PIN -->
+<div id="admin-passcode-modal" class="admin-modal-overlay">
+  <div class="admin-modal-box">
+    <div style="font-size:36px;color:var(--accent-dark);margin-bottom:8px;"><i class="ti ti-lock-square-rounded"></i></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--dark);font-weight:600;">Acceso de Administrador</h3>
+    <p style="font-size:12px;color:var(--muted);margin-top:4px;">Introduce el PIN de 4 dígitos.</p>
+    <div class="pin-input-container">
+      <input type="password" id="pin-1" class="pin-digit" maxlength="1" oninput="stepPINInput(this,1)" onkeydown="checkPINBackspace(event,1)" autocomplete="off">
+      <input type="password" id="pin-2" class="pin-digit" maxlength="1" oninput="stepPINInput(this,2)" onkeydown="checkPINBackspace(event,2)" autocomplete="off">
+      <input type="password" id="pin-3" class="pin-digit" maxlength="1" oninput="stepPINInput(this,3)" onkeydown="checkPINBackspace(event,3)" autocomplete="off">
+      <input type="password" id="pin-4" class="pin-digit" maxlength="1" oninput="stepPINInput(this,4)" onkeydown="checkPINBackspace(event,4)" autocomplete="off">
+    </div>
+    <p style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:16px;">Pista: Día de la boda DDMM (Ej. 14 Feb = 1402)</p>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button onclick="closeAdminModal()" style="padding:8px 16px;font-size:12px;border:.5px solid #C8BAA6;border-radius:4px;background:none;cursor:pointer;font-family:'Jost',sans-serif;color:var(--muted);">Cancelar</button>
+      <button onclick="verifyAdminPIN()" style="padding:8px 20px;font-size:12px;background:var(--dark);color:white;border:none;border-radius:4px;cursor:pointer;font-family:'Jost',sans-serif;">Verificar</button>
     </div>
   </div>
+</div>
 
-  <!-- MODAL: Custom Elegant Confirmation Dialog (Replaces native 'confirm') -->
-  <div id="custom-confirm-modal" class="admin-modal-overlay">
-    <div class="confirm-modal-box">
-      <div class="text-rose text-3xl mb-2"><i class="ti ti-trash"></i></div>
-      <h3 class="font-serif text-xl text-dark font-medium" id="confirm-title">¿Eliminar Invitado?</h3>
-      <p class="text-xs text-muted mt-2 mb-5" id="confirm-description">Esta acción es irreversible y removerá el registro del invitado.</p>
-      
-      <div class="flex gap-3 justify-center">
-        <button class="px-4 py-2 text-xs border border-[#C8BAA6] rounded text-muted hover:text-dark min-w-[80px]" id="confirm-btn-cancel">Cancelar</button>
-        <button class="px-5 py-2 text-xs bg-rose text-white rounded hover:bg-red-800 min-w-[80px]" id="confirm-btn-action">Eliminar</button>
+<!-- MODAL: Scan Result -->
+<div id="scan-result-modal" class="admin-modal-overlay">
+  <div class="admin-modal-box" style="max-width:360px;">
+    <div style="font-size:36px;color:#4F46E5;margin-bottom:8px;"><i class="ti ti-id-badge-2"></i></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--dark);font-weight:600;margin-bottom:4px;">Entrada Encontrada</h3>
+    <div style="border-top:.5px solid #EDE5D8;border-bottom:.5px solid #EDE5D8;padding:12px 0;margin:12px 0;text-align:left;">
+      <p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Invitado Principal</p>
+      <p id="scan-guest-name" style="font-size:16px;font-weight:600;color:var(--dark);margin-bottom:8px;">—</p>
+      <p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Mesa</p>
+      <p id="scan-guest-table" style="font-size:14px;font-weight:500;color:var(--dark);margin-bottom:8px;">—</p>
+      <p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Pases Confirmados</p>
+      <p id="scan-guest-pax" style="font-size:14px;font-weight:500;color:var(--dark);margin-bottom:8px;">—</p>
+      <div id="scan-dietary-row" style="display:none;">
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Notas Especiales</p>
+        <p id="scan-guest-dietary" style="font-size:13px;font-style:italic;color:#92400E;margin-bottom:8px;">—</p>
       </div>
+      <div id="scan-guest-badge" style="padding:10px;border-radius:4px;text-align:center;font-weight:700;font-size:12px;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button onclick="closeScanModal()" style="padding:8px 16px;font-size:12px;border:.5px solid #C8BAA6;border-radius:4px;background:none;cursor:pointer;font-family:'Jost',sans-serif;color:var(--muted);">Cancelar</button>
+      <button id="scan-action-btn" onclick="executeScanCheckin()" style="padding:8px 20px;font-size:12px;background:#4F46E5;color:white;border:none;border-radius:4px;cursor:pointer;font-family:'Jost',sans-serif;font-weight:500;">Confirmar Entrada</button>
     </div>
   </div>
+</div>
 
-  <!-- Custom Popup Toast Notification element -->
-  <div id="toast">
-    <i class="ti ti-circle-check" id="toast-icon"></i>
-    <span id="toast-text">Notificación exitosa</span>
+<!-- MODAL: Confirm Delete -->
+<div id="custom-confirm-modal" class="admin-modal-overlay">
+  <div class="confirm-modal-box">
+    <div style="font-size:32px;color:var(--rose);margin-bottom:8px;"><i class="ti ti-trash"></i></div>
+    <h3 id="confirm-title" style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--dark);font-weight:500;">¿Eliminar Invitado?</h3>
+    <p id="confirm-description" style="font-size:12px;color:var(--muted);margin-top:8px;margin-bottom:20px;">Esta acción es irreversible.</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button id="confirm-btn-cancel" style="padding:8px 16px;font-size:12px;border:.5px solid #C8BAA6;border-radius:4px;background:none;cursor:pointer;font-family:'Jost',sans-serif;color:var(--muted);min-width:80px;">Cancelar</button>
+      <button id="confirm-btn-action" style="padding:8px 20px;font-size:12px;background:var(--rose);color:white;border:none;border-radius:4px;cursor:pointer;font-family:'Jost',sans-serif;min-width:80px;">Eliminar</button>
+    </div>
   </div>
+</div>
 
-  <!-- Official Client QRCode JS library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  
-  <script>
-    // Robust Key Configuration
-    const STORAGE_KEY = 'event_guests_v3';
-    const SETTINGS_KEY = 'event_settings_v1';
+<div id="toast"><i class="ti ti-circle-check" id="toast-icon"></i><span id="toast-text">OK</span></div>
 
-    // Premium Default Wedding Database Backup (with "allowedPasses" / pases asignados)
-    const defaultGuests = [
-     {
-  id:'g001',
-  token: crypto.randomUUID(),
-  name:'Ana Martínez López',
-  table:'Mesa 1',
-  status:'pending',
-  dietary:'',
-  allowedPasses:2,
-  adults:2,
-  kids:0,
-  checkedIn:false
-}
-    {
-  id:'g002',
-  token: crypto.randomUUID(),
-  name:'Ana Martínez López',
-  table:'Mesa 1',
-  status:'pending',
-  dietary:'',
-  allowedPasses:2,
-  adults:2,
-  kids:0,
-  checkedIn:false
-}
-    {
-  id:'g003',
-  token: crypto.randomUUID(),
-  name:'Ana Martínez López',
-  table:'Mesa 1',
-  status:'pending',
-  dietary:'',
-  allowedPasses:2,
-  adults:2,
-  kids:0,
-  checkedIn:false
-}
-    ];
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    // Safe, multi-platform database helper
-    const storage = {
-      async get(key) {
-        if (window.storage && typeof window.storage.get === 'function') {
-          try {
-            const res = await window.storage.get(key);
-            return res ? res.value : null;
-          } catch (e) {
-            console.warn("Plat-get fallback executing:", e);
-          }
-        }
-        return localStorage.getItem(key);
-      },
-      async set(key, val) {
-        if (window.storage && typeof window.storage.set === 'function') {
-          try {
-            await window.storage.set(key, val);
-            return;
-          } catch (e) {
-            console.warn("Plat-set fallback executing:", e);
-          }
-        }
-        localStorage.setItem(key, val);
-      }
-    };
+<script>
+const STORAGE_KEY = 'event_guests_v3';
+const SETTINGS_KEY = 'event_settings_v2';
 
-    let guests = [];
-    let settings = { eventName: 'Boda de Sofía & Mateo', eventDate: '14 Feb 2026', adminPin: '1402' };
-    let selectedGuest = null;
-    let attending = null;
-    let isAdminUnlocked = false;
+const defaultGuests = [
+  {id:'g001',name:'Ana Martínez López',table:'Mesa 1',status:'pending',dietary:'',allowedPasses:2,adults:2,kids:0,checkedIn:false},
+  {id:'g002',name:'Carlos Mendoza',table:'Mesa 2',status:'pending',dietary:'',allowedPasses:3,adults:2,kids:1,checkedIn:false},
+  {id:'g003',name:'Laura Jiménez',table:'Mesa 1',status:'pending',dietary:'',allowedPasses:2,adults:2,kids:0,checkedIn:false},
+  {id:'g004',name:'Roberto García Soto',table:'Mesa 3',status:'pending',dietary:'',allowedPasses:4,adults:2,kids:2,checkedIn:false},
+  {id:'g005',name:'Fernanda López',table:'Mesa 2',status:'pending',dietary:'',allowedPasses:2,adults:2,kids:0,checkedIn:false},
+  {id:'g006',name:'Miguel Ángel Torres',table:'Mesa 4',status:'pending',dietary:'',allowedPasses:2,adults:2,kids:0,checkedIn:false},
+  {id:'g007',name:'Patricia Ruiz',table:'Mesa 3',status:'pending',dietary:'',allowedPasses:2,adults:1,kids:1,checkedIn:false},
+  {id:'g008',name:'Javier Hernández',table:'Mesa 4',status:'pending',dietary:'',allowedPasses:3,adults:3,kids:0,checkedIn:false},
+  {id:'g009',name:'Diana Castillo',table:'Mesa 5',status:'pending',dietary:'',allowedPasses:2,adults:2,kids:0,checkedIn:false},
+  {id:'g010',name:'Eduardo Reyes',table:'Mesa 5',status:'pending',dietary:'',allowedPasses:2,adults:2,kids:0,checkedIn:false},
+];
 
-    // Custom confirm dialog trigger structure
-    let confirmCallback = null;
+// Theme presets
+const THEME_PRESETS = [
+  {name:'Dorado clásico',accent:'#C9A84C',accentDark:'#8B6914',accentLight:'#E8D5A3',bg:'#FAF7F2',header:'#1A1612',surface:'#FFFFFF'},
+  {name:'Rosa romántico',accent:'#C96E7A',accentDark:'#8B3040',accentLight:'#F2C4CB',bg:'#FDF5F5',header:'#2D1318',surface:'#FFFFFF'},
+  {name:'Verde jardín',accent:'#5A8A5A',accentDark:'#2D5C2D',accentLight:'#B5D5B5',bg:'#F5FAF5',header:'#1A2E1A',surface:'#FFFFFF'},
+  {name:'Azul mar',accent:'#4A7FA8',accentDark:'#1E4F6B',accentLight:'#B5D5E8',bg:'#F5F9FC',header:'#0D2233',surface:'#FFFFFF'},
+  {name:'Morado elegante',accent:'#7A5A9C',accentDark:'#4A2870',accentLight:'#CDB8E8',bg:'#F8F5FC',header:'#1E0D33',surface:'#FFFFFF'},
+  {name:'Terracota',accent:'#C27B52',accentDark:'#7A3E18',accentLight:'#E8C8A8',bg:'#FBF6F2',header:'#2A1508',surface:'#FFFFFF'},
+];
 
-    async function loadData() {
-      try {
-        const gr = await storage.get(STORAGE_KEY);
-        if (gr) {
-          guests = JSON.parse(gr);
-          // Migración para registros antiguos que no tengan allowedPasses
-          guests = guests.map(g => {
-            if (g.allowedPasses === undefined) {
-              g.allowedPasses = g.pax || 2;
-            }
-            return g;
-          });
-        } else { 
-          guests = JSON.parse(JSON.stringify(defaultGuests)); 
-          await saveData(); 
-        }
-      } catch(e) { 
-        guests = JSON.parse(JSON.stringify(defaultGuests)); 
-      }
-
-      try {
-        const sr = await storage.get(SETTINGS_KEY);
-        if (sr) { 
-          const loadedSettings = JSON.parse(sr);
-          settings = { ...settings, ...loadedSettings };
-          applySettings(); 
-        }
-      } catch(e) {}
-
-      updateAdminStats();
-      renderAdminList();
-      initSparkles();
+const storage = {
+  async get(key) {
+    if (window.storage && typeof window.storage.get === 'function') {
+      try { const r = await window.storage.get(key); return r ? r.value : null; } catch(e){}
     }
-
-    async function saveData() {
-      try { 
-        await storage.set(STORAGE_KEY, JSON.stringify(guests)); 
-      } catch(e) {}
+    return localStorage.getItem(key);
+  },
+  async set(key, val) {
+    if (window.storage && typeof window.storage.set === 'function') {
+      try { await window.storage.set(key, val); return; } catch(e){}
     }
+    localStorage.setItem(key, val);
+  }
+};
 
-    async function saveSettingsData() {
-      try { 
-        await storage.set(SETTINGS_KEY, JSON.stringify(settings)); 
-      } catch(e) {}
-    }
+let guests = [];
+let settings = {
+  eventName:'Boda de Sofía & Mateo',
+  eventDate:'14 Feb 2026',
+  adminPin:'1402',
+  bride:'Sofía',
+  groom:'Mateo',
+  theme:{accent:'#C9A84C',accentDark:'#8B6914',accentLight:'#E8D5A3',bg:'#FAF7F2',header:'#1A1612',surface:'#FFFFFF'}
+};
+let selectedGuest = null;
+let attending = null;
+let isAdminUnlocked = false;
+let html5QrcodeScanner = null;
+let scannedGuestObj = null;
 
-    function applySettings() {
-      document.getElementById('event-name-input').value = settings.eventName;
-      document.getElementById('event-date-input').value = settings.eventDate;
-      document.getElementById('admin-pin-input').value = settings.adminPin || '1402';
-      document.getElementById('header-subtitle').textContent = `Confirmación: ${settings.eventName}`;
-      document.getElementById('header-date').textContent = settings.eventDate;
-      document.getElementById('qr-event-label').textContent = settings.eventName + ' · ' + settings.eventDate;
-    }
-
-    function saveSettings() {
-      settings.eventName = document.getElementById('event-name-input').value || settings.eventName;
-      settings.eventDate = document.getElementById('event-date-input').value || settings.eventDate;
-      
-      const rawPin = document.getElementById('admin-pin-input').value.trim();
-      if (rawPin.length === 4 && /^\d+$/.test(rawPin)) {
-        settings.adminPin = rawPin;
-      } else {
-        showToast("El PIN debe constar exactamente de 4 números", "ti-alert-circle");
-        return;
-      }
-
-      saveSettingsData();
-      applySettings();
-      showToast("Configuración guardada exitosamente", "ti-circle-check");
-    }
-
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-' + id).classList.add('active');
-      if (id === 'search') { 
-        document.getElementById('search-input').value = ''; 
-        document.getElementById('results-list').style.display = 'none'; 
-        attending = null; 
-      }
-    }
-
-    const searchInput = document.getElementById('search-input');
-    const resultsList = document.getElementById('results-list');
-
-    searchInput.addEventListener('input', () => {
-      const q = searchInput.value.toLowerCase().trim();
-      if (!q) { 
-        resultsList.style.display = 'none'; 
-        return; 
-      }
-      const matches = guests.filter(g => g.name.toLowerCase().includes(q));
-      if (!matches.length) {
-        resultsList.style.display = 'block';
-        resultsList.innerHTML = '<div class="no-results">No se encontró ningún invitado con ese nombre</div>';
-        return;
-      }
-      resultsList.style.display = 'block';
-      resultsList.innerHTML = matches.map(g => {
-        const sc = g.status === 'confirmed' ? 'status-confirmed' : g.status === 'declined' ? 'status-declined' : 'status-pending';
-        const sl = g.status === 'confirmed' ? 'Confirmado' : g.status === 'declined' ? 'Declinó' : 'Pendiente';
-        return `<li onclick="selectGuest('${g.id}')">
-          <div>
-            <div class="guest-name">${g.name}</div>
-            <div class="guest-table">${g.table} — <strong class="text-[#8B6914] font-normal">${g.allowedPasses} pases</strong></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="guest-status ${sc}">${sl}</span>
-            <i class="ti ti-chevron-right arrow-icon" aria-hidden="true"></i>
-          </div>
-        </li>`;
-      }).join('');
-    });
-
-    function selectGuest(id) {
-      selectedGuest = guests.find(g => g.id === id);
-      if (!selectedGuest) return;
-      
-      document.getElementById('cf-name').textContent = selectedGuest.name;
-      document.getElementById('cf-table').textContent = selectedGuest.table || 'Sin Mesa Asignada';
-      document.getElementById('btn-yes').classList.remove('selected');
-      document.getElementById('btn-no').classList.remove('selected');
-      document.getElementById('yes-fields').style.display = 'none';
-      document.getElementById('btn-submit').style.display = 'none';
-      document.getElementById('dietary').value = selectedGuest.dietary || '';
-
-      // Configure Dynamic Allowed Passes limits
-      const limit = selectedGuest.allowedPasses || 2;
-      document.getElementById('pases-limite').textContent = limit;
-      document.getElementById('pases-badge').classList.remove('hidden');
-
-      // Setup Selectors options limited strictly by custom allowed passes
-      const adultsSelect = document.getElementById('adults-count');
-      const kidsSelect = document.getElementById('kids-count');
-      
-      // Clear options
-      adultsSelect.innerHTML = '';
-      kidsSelect.innerHTML = '';
-
-      // Generate options strictly inside safe boundaries
-      for (let i = 1; i <= limit; i++) {
-        adultsSelect.innerHTML += `<option value="${i}">${i} adulto${i > 1 ? 's' : ''}</option>`;
-      }
-      for (let i = 0; i <= limit; i++) {
-        kidsSelect.innerHTML += `<option value="${i}" ${i === 0 ? 'selected' : ''}>${i === 0 ? 'Sin niños' : `${i} niño${i > 1 ? 's' : ''}`}</option>`;
-      }
-
-      // Default presets
-      if (selectedGuest.status === 'confirmed') {
-        adultsSelect.value = selectedGuest.adults || 1;
-        kidsSelect.value = selectedGuest.kids || 0;
-      } else {
-        adultsSelect.value = Math.min(limit, 2);
-        kidsSelect.value = 0;
-      }
-
-      validatePassLimit();
-
-      attending = null;
-      showScreen('confirm');
-    }
-
-    function validatePassLimit() {
-      const limit = selectedGuest ? selectedGuest.allowedPasses : 2;
-      const adults = parseInt(document.getElementById('adults-count').value) || 1;
-      const kids = parseInt(document.getElementById('kids-count').value) || 0;
-      const total = adults + kids;
-
-      const warning = document.getElementById('limit-warning');
-      const submitBtn = document.getElementById('btn-submit');
-
-      if (total > limit) {
-        warning.classList.remove('hidden');
-        submitBtn.disabled = true;
-        submitBtn.style.opacity = '0.5';
-        submitBtn.style.pointerEvents = 'none';
-      } else {
-        warning.classList.add('hidden');
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = '1';
-        submitBtn.style.pointerEvents = 'auto';
-      }
-    }
-
-    function selectAttending(val) {
-      attending = val;
-      document.getElementById('btn-yes').classList.toggle('selected', val);
-      document.getElementById('btn-no').classList.toggle('selected', !val);
-      document.getElementById('yes-fields').style.display = val ? 'block' : 'none';
-      document.getElementById('btn-submit').style.display = 'block';
-    }
-
-    async function submitConfirmation() {
-      if (!selectedGuest || attending === null) return;
-      const idx = guests.findIndex(g => g.id === selectedGuest.id);
-      
-      if (attending) {
-        const adults = parseInt(document.getElementById('adults-count').value) || 1;
-        const kids = parseInt(document.getElementById('kids-count').value) || 0;
-        const total = adults + kids;
-        const dietary = document.getElementById('dietary').value.trim();
-        
-        // Final sanity check
-        if (total > selectedGuest.allowedPasses) {
-          showToast("Has excedido el número de pases asignados", "ti-alert-circle");
-          return;
-        }
-
-        guests[idx].status = 'confirmed';
-        guests[idx].pax = total;
-        guests[idx].dietary = dietary;
-        guests[idx].adults = adults;
-        guests[idx].kids = kids;
-        selectedGuest = guests[idx];
-        
-        await saveData();
-        updateAdminStats();
-        renderAdminList();
-        showQR();
-        showToast("¡Asistencia confirmada!", "ti-circle-check");
-      } else {
-        guests[idx].status = 'declined';
-        guests[idx].pax = 0;
-        guests[idx].adults = 0;
-        guests[idx].kids = 0;
-        guests[idx].dietary = '';
-        
-        await saveData();
-        updateAdminStats();
-        renderAdminList();
-        showScreen('declined');
-        showToast("Respuesta enviada", "ti-heart-off");
-      }
-    }
-
-    function showQR() {
-      showScreen('qr');
-      document.getElementById('qr-name').textContent = selectedGuest.name;
-      document.getElementById('qr-event-label').textContent = settings.eventName + ' · ' + settings.eventDate;
-      document.getElementById('qr-table-info').textContent = selectedGuest.table || 'Sin Mesa Asignada';
-      
-      const adultsNum = selectedGuest.adults || 1;
-      const kidsNum = selectedGuest.kids || 0;
-      const paxTxt = adultsNum + ' adulto' + (adultsNum > 1 ? 's' : '') + (kidsNum > 0 ? ` + ${kidsNum} niño${kidsNum > 1 ? 's' : ''}` : '') + ` (${selectedGuest.pax} pase${selectedGuest.pax > 1 ? 's' : ''})`;
-      document.getElementById('qr-pax').textContent = paxTxt;
-      
-      // Consistent secure ID format
-      const code = selectedGuest.id.toUpperCase() + '-' + Math.floor(Math.random() * 1000).toString(16).toUpperCase();
-      document.getElementById('qr-code-text').textContent = code;
-      selectedGuest.qrCode = code;
-
-      const canvas = document.getElementById('qr-canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, 180, 180);
-
-      const qrData = JSON.stringify({ 
-        id: selectedGuest.id, 
-        name: selectedGuest.name, 
-        table: selectedGuest.table, 
-        pax: selectedGuest.pax, 
-        code: code, 
-        event: settings.eventName 
+async function loadData() {
+  try {
+    const gr = await storage.get(STORAGE_KEY);
+    if (gr) {
+      guests = JSON.parse(gr);
+      guests = guests.map(g => {
+        if (g.allowedPasses === undefined) g.allowedPasses = g.pax || 2;
+        if (g.checkedIn === undefined) g.checkedIn = false;
+        return g;
       });
-
-      try {
-        const tempContainer = document.createElement('div');
-        const qr = new QRCode(tempContainer, {
-          text: qrData,
-          width: 160,
-          height: 160,
-          colorDark: '#1A1612',
-          colorLight: '#FFFFFF',
-          correctLevel: QRCode.CorrectLevel.M
-        });
-        
-        setTimeout(() => {
-          const img = tempContainer.querySelector('img') || tempContainer.querySelector('canvas');
-          if (img) {
-            const tempImg = new Image();
-            tempImg.onload = () => {
-              ctx.fillStyle = '#FFFFFF';
-              ctx.fillRect(0, 0, 180, 180);
-              ctx.drawImage(tempImg, 10, 10, 160, 160);
-            };
-            if (img.tagName === 'CANVAS') {
-              tempImg.src = img.toDataURL();
-            } else {
-              tempImg.src = img.src;
-            }
-          }
-        }, 300);
-      } catch(e) {
-        console.error("QR Code library fallback error:", e);
-        ctx.fillStyle = '#1A1612';
-        ctx.font = '11px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('Código QR: ' + code, 90, 90);
-      }
-    }
-
-    function downloadQR() {
-      const canvas = document.getElementById('qr-canvas');
-      const offscreen = document.createElement('canvas');
-      offscreen.width = 340;
-      offscreen.height = 420;
-      const ctx = offscreen.getContext('2d');
-      
-      // Draw luxury backdrop
-      ctx.fillStyle = '#FAF7F2';
-      ctx.fillRect(0, 0, 340, 420);
-      
-      // Draw double gold accents
-      ctx.strokeStyle = '#C9A84C';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(10, 10, 320, 400);
-      ctx.strokeStyle = '#E8D5A3';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(14, 14, 312, 392);
-      
-      // Render text header
-      ctx.fillStyle = '#8B6914';
-      ctx.font = 'bold 11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.letterSpacing = '3px';
-      ctx.fillText(settings.eventName.toUpperCase(), 170, 42);
-      
-      ctx.fillStyle = '#1A1612';
-      ctx.font = '300 22px Georgia, serif';
-      ctx.fillText(selectedGuest.name, 170, 78);
-      
-      ctx.fillStyle = '#6B5E4E';
-      ctx.font = '300 13px sans-serif';
-      ctx.fillText((selectedGuest.table || 'Sin Mesa') + ' · ' + settings.eventDate, 170, 102);
-      
-      ctx.drawImage(canvas, 80, 118, 180, 180);
-      
-      ctx.strokeStyle = '#E8D5A3';
-      ctx.beginPath();
-      ctx.moveTo(30, 318);
-      ctx.lineTo(310, 318);
-      ctx.stroke();
-      
-      ctx.fillStyle = '#6B5E4E';
-      ctx.font = '12px sans-serif';
-      ctx.fillText('Pases: ' + selectedGuest.pax + ' | Código: ' + (document.getElementById('qr-code-text').textContent), 170, 342);
-      
-      ctx.fillStyle = '#8B6914';
-      ctx.font = 'italic 11px Georgia, serif';
-      ctx.fillText('Presentar en recepción del evento', 170, 372);
-
-      const link = document.createElement('a');
-      link.download = 'pase-boda-' + selectedGuest.id + '.png';
-      link.href = offscreen.toDataURL('image/png');
-      link.click();
-      showToast("Pase descargado exitosamente", "ti-download");
-    }
-
-    function toggleAdmin() {
-      if (isAdminUnlocked) {
-        // Toggle view
-        const s = document.getElementById('admin-section');
-        s.style.display = s.style.display === 'none' ? 'block' : 'none';
-      } else {
-        openAdminModal();
-      }
-    }
-
-    function openAdminModal() {
-      // Clear inputs
-      document.getElementById('pin-1').value = '';
-      document.getElementById('pin-2').value = '';
-      document.getElementById('pin-3').value = '';
-      document.getElementById('pin-4').value = '';
-      
-      document.getElementById('admin-passcode-modal').classList.add('active');
-      setTimeout(() => {
-        document.getElementById('pin-1').focus();
-      }, 300);
-    }
-
-    function closeAdminModal() {
-      document.getElementById('admin-passcode-modal').classList.remove('active');
-    }
-
-    // Move to next digit field automatically
-    function stepPINInput(elem, index) {
-      if (elem.value.length === 1 && index < 4) {
-        document.getElementById(`pin-${index + 1}`).focus();
-      }
-      // If all digits entered, allow quick verification
-      if (index === 4 && elem.value.length === 1) {
-        verifyAdminPIN();
-      }
-    }
-
-    function checkPINBackspace(e, index) {
-      if (e.key === 'Backspace' && !e.target.value && index > 1) {
-        document.getElementById(`pin-${index - 1}`).focus();
-      }
-    }
-
-    function verifyAdminPIN() {
-      const p1 = document.getElementById('pin-1').value;
-      const p2 = document.getElementById('pin-2').value;
-      const p3 = document.getElementById('pin-3').value;
-      const p4 = document.getElementById('pin-4').value;
-      const enteredPIN = p1 + p2 + p3 + p4;
-
-      const expectedPIN = settings.adminPin || '1402';
-
-      if (enteredPIN === expectedPIN) {
-        isAdminUnlocked = true;
-        closeAdminModal();
-        
-        // Show panel
-        document.getElementById('admin-section').style.display = 'block';
-        
-        // Change Lock indicator icon
-        const icon = document.getElementById('admin-lock-icon');
-        icon.className = 'ti ti-lock-open';
-        
-        showToast("Acceso Concedido como Admin", "ti-lock-open");
-      } else {
-        showToast("Clave PIN incorrecta", "ti-alert-triangle");
-        // Clear all
-        document.getElementById('pin-1').value = '';
-        document.getElementById('pin-2').value = '';
-        document.getElementById('pin-3').value = '';
-        document.getElementById('pin-4').value = '';
-        document.getElementById('pin-1').focus();
-      }
-    }
-
-    function logoutAdmin() {
-      isAdminUnlocked = false;
-      document.getElementById('admin-section').style.display = 'none';
-      document.getElementById('admin-lock-icon').className = 'ti ti-lock';
-      showToast("Sesión cerrada como Admin", "ti-lock");
-    }
-
-    function updateAdminStats() {
-      document.getElementById('stat-total').textContent = guests.length;
-      document.getElementById('stat-confirmed').textContent = guests.filter(g => g.status === 'confirmed').length;
-      document.getElementById('stat-declined').textContent = guests.filter(g => g.status === 'declined').length;
-    }
-
-    function renderAdminList() {
-      const list = document.getElementById('admin-list');
-      const sortedGuests = [...guests].sort((a, b) => a.name.localeCompare(b.name));
-      
-      list.innerHTML = sortedGuests.map(g => {
-        const bc = g.status === 'confirmed' ? 'badge-c' : g.status === 'declined' ? 'badge-d' : 'badge-p';
-        const bl = g.status === 'confirmed' ? 'Confirmado' : g.status === 'declined' ? 'Declinó' : 'Pendiente';
-        
-        // Display passes limits
-        const passesText = g.status === 'confirmed' ? `${g.pax} / ${g.allowedPasses} pases` : `${g.allowedPasses} pases autorizados`;
-        
-        return `<div class="admin-row">
-          <div class="flex-1">
-            <span class="admin-name block">${g.name}</span>
-            <span class="text-xs text-muted block font-light">${g.table || 'Sin mesa'} · ${passesText}</span>
-          </div>
-          <span class="badge ${bc} ml-2 shrink-0">${bl}</span>
-          <button class="text-[#C4958E] hover:text-red-700 p-1 shrink-0 text-lg transition-colors ml-2" onclick="promptRemoveGuest('${g.id}')" title="Eliminar de lista">
-            <i class="ti ti-trash" aria-hidden="true"></i>
-          </button>
-        </div>`;
-      }).join('');
-    }
-
-    // Custom confirm implementation for sandboxed environments
-    function promptRemoveGuest(id) {
-      const overlay = document.getElementById('custom-confirm-modal');
-      const targetGuest = guests.find(g => g.id === id);
-      if (!targetGuest) return;
-
-      document.getElementById('confirm-title').textContent = '¿Eliminar Invitado?';
-      document.getElementById('confirm-description').textContent = `¿Estás seguro de que deseas eliminar a "${targetGuest.name}" del registro del evento?`;
-      
-      overlay.classList.add('active');
-
-      document.getElementById('confirm-btn-cancel').onclick = () => {
-        overlay.classList.remove('active');
-      };
-
-      document.getElementById('confirm-btn-action').onclick = async () => {
-        overlay.classList.remove('active');
-        guests = guests.filter(g => g.id !== id);
-        await saveData();
-        updateAdminStats();
-        renderAdminList();
-        showToast("Invitado eliminado de la lista", "ti-trash");
-      };
-    }
-
-    async function addGuest() {
-      const name = document.getElementById('new-guest-name').value.trim();
-      const table = document.getElementById('new-guest-table').value.trim() || 'Mesa 1';
-      const passesInput = parseInt(document.getElementById('new-guest-passes').value) || 2;
-      
-      if (!name) {
-        showToast("Favor de ingresar el nombre del invitado", "ti-alert-circle");
-        return;
-      }
-      
-      const id = 'g' + Date.now().toString(36);
-      guests.push({ 
-        id, 
-        name, 
-        table, 
-        status: 'pending', 
-        dietary: '', 
-        allowedPasses: passesInput,
-        pax: passesInput, 
-        adults: passesInput, 
-        kids: 0 
-      });
-      
+    } else {
+      guests = JSON.parse(JSON.stringify(defaultGuests));
       await saveData();
-      updateAdminStats();
-      renderAdminList();
-      
-      document.getElementById('new-guest-name').value = '';
-      document.getElementById('new-guest-table').value = '';
-      document.getElementById('new-guest-passes').value = '2';
-      showToast("Invitado agregado correctamente", "ti-user-plus");
     }
+  } catch(e) { guests = JSON.parse(JSON.stringify(defaultGuests)); }
 
-    function exportToCSV() {
-      if (guests.length === 0) return;
-
-      const headers = ['ID', 'Nombre', 'Mesa', 'Adultos', 'Niños', 'Total Pases Confirmados', 'Límite Pases Asignados', 'Estado RSVP', 'Restricciones'];
-      const rows = guests.map(g => [
-        g.id,
-        g.name,
-        g.table || 'Sin Mesa',
-        g.adults || 0,
-        g.kids || 0,
-        g.pax || 0,
-        g.allowedPasses || 2,
-        g.status,
-        g.dietary || ''
-      ]);
-
-      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
-        + [headers.join(','), ...rows.map(e => e.map(val => `"${val}"`).join(','))].join('\n');
-      
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "invitados_boda_sofia_mateo_pases.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showToast("Listado exportado como CSV", "ti-file-spreadsheet");
+  try {
+    const sr = await storage.get(SETTINGS_KEY);
+    if (sr) {
+      const loaded = JSON.parse(sr);
+      settings = { ...settings, ...loaded };
+      if (!settings.theme) settings.theme = THEME_PRESETS[0];
     }
+  } catch(e) {}
 
-    function showToast(text, icon = "ti-circle-check") {
-      const toast = document.getElementById('toast');
-      const toastText = document.getElementById('toast-text');
-      const toastIcon = document.getElementById('toast-icon');
-      
-      toastText.textContent = text;
-      toastIcon.className = `ti ${icon}`;
-      
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3500);
+  applySettings();
+  updateAdminStats();
+  renderAdminList();
+  renderThemePresets();
+  initSparkles();
+}
+
+async function saveData() {
+  try { await storage.set(STORAGE_KEY, JSON.stringify(guests)); } catch(e){}
+}
+
+async function saveSettingsData() {
+  try { await storage.set(SETTINGS_KEY, JSON.stringify(settings)); } catch(e){}
+}
+
+function applySettings() {
+  // Names
+  document.getElementById('name-bride').textContent = settings.bride || 'Sofía';
+  document.getElementById('name-groom').textContent = settings.groom || 'Mateo';
+  document.getElementById('header-subtitle').textContent = `Confirmación: ${settings.eventName}`;
+  document.getElementById('header-date').textContent = settings.eventDate;
+  document.getElementById('qr-event-label').textContent = settings.eventName + ' · ' + settings.eventDate;
+
+  // Admin fields
+  document.getElementById('setting-bride').value = settings.bride || 'Sofía';
+  document.getElementById('setting-groom').value = settings.groom || 'Mateo';
+  document.getElementById('event-name-input').value = settings.eventName;
+  document.getElementById('event-date-input').value = settings.eventDate;
+  document.getElementById('admin-pin-input').value = settings.adminPin || '1402';
+
+  // Apply theme CSS vars
+  applyThemeColors(settings.theme || THEME_PRESETS[0]);
+
+  // Sync color pickers
+  const t = settings.theme || THEME_PRESETS[0];
+  document.getElementById('color-accent').value = t.accent || '#C9A84C';
+  document.getElementById('color-bg').value = t.bg || '#FAF7F2';
+  document.getElementById('color-header').value = t.header || '#1A1612';
+  document.getElementById('color-surface').value = t.surface || '#FFFFFF';
+}
+
+function applyThemeColors(t) {
+  const root = document.documentElement;
+  root.style.setProperty('--accent', t.accent);
+  root.style.setProperty('--accent-dark', t.accentDark || darken(t.accent));
+  root.style.setProperty('--accent-light', t.accentLight || lighten(t.accent));
+  root.style.setProperty('--bg', t.bg);
+  root.style.setProperty('--header-bg', t.header);
+  root.style.setProperty('--surface', t.surface);
+  root.style.setProperty('--gold', t.accent);
+  root.style.setProperty('--gold-dark', t.accentDark || darken(t.accent));
+  root.style.setProperty('--gold-light', t.accentLight || lighten(t.accent));
+  root.style.setProperty('--cream', t.bg);
+}
+
+function previewTheme() {
+  const accent = document.getElementById('color-accent').value;
+  const bg = document.getElementById('color-bg').value;
+  const header = document.getElementById('color-header').value;
+  const surface = document.getElementById('color-surface').value;
+  applyThemeColors({ accent, accentDark: darken(accent), accentLight: lighten(accent), bg, header, surface });
+}
+
+function darken(hex) {
+  const r = Math.max(0, parseInt(hex.slice(1,3),16) - 60);
+  const g = Math.max(0, parseInt(hex.slice(3,5),16) - 60);
+  const b = Math.max(0, parseInt(hex.slice(5,7),16) - 60);
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+function lighten(hex) {
+  const r = Math.min(255, parseInt(hex.slice(1,3),16) + 80);
+  const g = Math.min(255, parseInt(hex.slice(3,5),16) + 80);
+  const b = Math.min(255, parseInt(hex.slice(5,7),16) + 80);
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+
+function renderThemePresets() {
+  const container = document.getElementById('theme-presets');
+  container.innerHTML = THEME_PRESETS.map((t, i) => `
+    <div class="theme-swatch" title="${t.name}" style="background:${t.accent};border-color:${(settings.theme && settings.theme.accent===t.accent)?'var(--dark)':'transparent'}" onclick="applyPreset(${i})"></div>
+  `).join('');
+}
+
+function applyPreset(i) {
+  const t = THEME_PRESETS[i];
+  settings.theme = t;
+  applyThemeColors(t);
+  document.getElementById('color-accent').value = t.accent;
+  document.getElementById('color-bg').value = t.bg;
+  document.getElementById('color-header').value = t.header;
+  document.getElementById('color-surface').value = t.surface;
+  renderThemePresets();
+  showToast('Paleta "' + t.name + '" aplicada', 'ti-palette');
+}
+
+function saveSettings() {
+  settings.bride = document.getElementById('setting-bride').value.trim() || 'Sofía';
+  settings.groom = document.getElementById('setting-groom').value.trim() || 'Mateo';
+  settings.eventName = document.getElementById('event-name-input').value || settings.eventName;
+  settings.eventDate = document.getElementById('event-date-input').value || settings.eventDate;
+
+  const rawPin = document.getElementById('admin-pin-input').value.trim();
+  if (rawPin.length === 4 && /^\d+$/.test(rawPin)) {
+    settings.adminPin = rawPin;
+  } else {
+    showToast('El PIN debe ser exactamente 4 números', 'ti-alert-circle');
+    return;
+  }
+
+  const accent = document.getElementById('color-accent').value;
+  const bg = document.getElementById('color-bg').value;
+  const header = document.getElementById('color-header').value;
+  const surface = document.getElementById('color-surface').value;
+  settings.theme = { accent, accentDark: darken(accent), accentLight: lighten(accent), bg, header, surface };
+
+  saveSettingsData();
+  applySettings();
+  showToast('Configuración guardada', 'ti-circle-check');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  if (id === 'search') {
+    document.getElementById('search-input').value = '';
+    document.getElementById('results-list').style.display = 'none';
+    attending = null;
+  }
+}
+
+// Fix #2: Search only after 3 chars typed
+// Fix #3: Filter out confirmed/declined guests from search results
+const searchInput = document.getElementById('search-input');
+const resultsList = document.getElementById('results-list');
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  if (q.length < 3) {
+    resultsList.style.display = 'none';
+    return;
+  }
+  // Only show guests that are still pending (haven't responded yet)
+  const matches = guests.filter(g => g.name.toLowerCase().includes(q) && g.status === 'pending');
+  if (!matches.length) {
+    resultsList.style.display = 'block';
+    resultsList.innerHTML = '<div class="no-results">No se encontró ningún invitado pendiente con ese nombre</div>';
+    return;
+  }
+  resultsList.style.display = 'block';
+  resultsList.innerHTML = matches.map(g =>
+    `<li onclick="selectGuest('${g.id}')">
+      <div>
+        <div class="guest-name">${g.name}</div>
+      </div>
+      <i class="ti ti-chevron-right arrow-icon"></i>
+    </li>`
+  ).join('');
+});
+
+function selectGuest(id) {
+  selectedGuest = guests.find(g => g.id === id);
+  if (!selectedGuest) return;
+
+  // Fix #4: Only show name, NOT table or pass count to guest
+  document.getElementById('cf-name').textContent = selectedGuest.name;
+  document.getElementById('btn-yes').classList.remove('selected');
+  document.getElementById('btn-no').classList.remove('selected');
+  document.getElementById('yes-fields').style.display = 'none';
+  document.getElementById('btn-submit').style.display = 'none';
+  document.getElementById('dietary').value = selectedGuest.dietary || '';
+  document.getElementById('pases-badge').classList.add('hidden');
+
+  const limit = selectedGuest.allowedPasses || 2;
+  const adultsSelect = document.getElementById('adults-count');
+  const kidsSelect = document.getElementById('kids-count');
+  adultsSelect.innerHTML = '';
+  kidsSelect.innerHTML = '';
+  for (let i = 1; i <= limit; i++) {
+    adultsSelect.innerHTML += `<option value="${i}">${i} adulto${i>1?'s':''}</option>`;
+  }
+  for (let i = 0; i <= limit; i++) {
+    kidsSelect.innerHTML += `<option value="${i}" ${i===0?'selected':''}>${i===0?'Sin niños':`${i} niño${i>1?'s':''}`}</option>`;
+  }
+  adultsSelect.value = Math.min(limit, 2);
+  kidsSelect.value = 0;
+
+  attending = null;
+  showScreen('confirm');
+}
+
+function validatePassLimit() {
+  const limit = selectedGuest ? selectedGuest.allowedPasses : 2;
+  const adults = parseInt(document.getElementById('adults-count').value) || 1;
+  const kids = parseInt(document.getElementById('kids-count').value) || 0;
+  const total = adults + kids;
+  const warning = document.getElementById('limit-warning');
+  const submitBtn = document.getElementById('btn-submit');
+  if (total > limit) {
+    warning.classList.remove('hidden');
+    submitBtn.disabled = true; submitBtn.style.opacity='.5'; submitBtn.style.pointerEvents='none';
+  } else {
+    warning.classList.add('hidden');
+    submitBtn.disabled = false; submitBtn.style.opacity='1'; submitBtn.style.pointerEvents='auto';
+  }
+}
+
+function selectAttending(val) {
+  attending = val;
+  document.getElementById('btn-yes').classList.toggle('selected', val);
+  document.getElementById('btn-no').classList.toggle('selected', !val);
+  document.getElementById('yes-fields').style.display = val ? 'block' : 'none';
+  // Show pases badge only when confirming YES
+  document.getElementById('pases-badge').classList.toggle('hidden', !val);
+  document.getElementById('pases-limite').textContent = selectedGuest ? selectedGuest.allowedPasses : 0;
+  document.getElementById('btn-submit').style.display = 'block';
+}
+
+async function submitConfirmation() {
+  if (!selectedGuest || attending === null) return;
+  const idx = guests.findIndex(g => g.id === selectedGuest.id);
+  if (attending) {
+    const adults = parseInt(document.getElementById('adults-count').value) || 1;
+    const kids = parseInt(document.getElementById('kids-count').value) || 0;
+    const total = adults + kids;
+    const dietary = document.getElementById('dietary').value.trim();
+    if (total > selectedGuest.allowedPasses) {
+      showToast('Has excedido el número de pases asignados', 'ti-alert-circle');
+      return;
     }
+    guests[idx].status = 'confirmed';
+    guests[idx].pax = total;
+    guests[idx].dietary = dietary;
+    guests[idx].adults = adults;
+    guests[idx].kids = kids;
+    selectedGuest = guests[idx];
+    await saveData(); updateAdminStats(); renderAdminList();
+    showQR();
+    showToast('¡Asistencia confirmada!', 'ti-circle-check');
+  } else {
+    guests[idx].status = 'declined';
+    guests[idx].pax = 0; guests[idx].adults = 0; guests[idx].kids = 0;
+    guests[idx].dietary = ''; guests[idx].checkedIn = false;
+    await saveData(); updateAdminStats(); renderAdminList();
+    showScreen('declined');
+    showToast('Respuesta registrada', 'ti-heart-off');
+  }
+}
 
-    function initSparkles() {
-      const canvas = document.getElementById('sparkle-canvas');
-      const ctx = canvas.getContext('2d');
-      let particles = [];
+// Fix #1: Robust QR generation with retry and proper container clearing
+function showQR() {
+  showScreen('qr');
+  document.getElementById('qr-name').textContent = selectedGuest.name;
+  document.getElementById('qr-event-label').textContent = settings.eventName + ' · ' + settings.eventDate;
+  document.getElementById('qr-table-info').textContent = selectedGuest.table || 'Sin Mesa Asignada';
 
-      function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      window.addEventListener('resize', resize);
-      resize();
+  const adultsNum = selectedGuest.adults || 1;
+  const kidsNum = selectedGuest.kids || 0;
+  const paxTxt = adultsNum + ' adulto' + (adultsNum>1?'s':'') + (kidsNum>0?` + ${kidsNum} niño${kidsNum>1?'s':''}`:'') + ` (${selectedGuest.pax} pase${selectedGuest.pax>1?'s':''})`;
+  document.getElementById('qr-pax').textContent = paxTxt;
 
-      class Sparkle {
-        constructor() {
-          this.reset();
-        }
-        reset() {
-          this.x = Math.random() * canvas.width;
-          this.y = canvas.height + 10;
-          this.size = Math.random() * 2 + 0.5;
-          this.speedX = Math.random() * 0.4 - 0.2;
-          this.speedY = Math.random() * 0.4 + 0.2;
-          this.opacity = Math.random() * 0.5 + 0.1;
-          this.fade = Math.random() * 0.01 + 0.002;
-        }
-        update() {
-          this.x += this.speedX;
-          this.y -= this.speedY;
-          this.opacity -= this.fade;
-          if (this.opacity <= 0 || this.y < 0) {
-            this.reset();
-          }
-        }
-        draw() {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(201, 168, 76, ${this.opacity})`;
-          ctx.fill();
-        }
-      }
+  const code = selectedGuest.id.toUpperCase() + '-' + Date.now().toString(36).toUpperCase().slice(-4);
+  document.getElementById('qr-code-text').textContent = code;
+  selectedGuest.qrCode = code;
 
-      for (let i = 0; i < 35; i++) {
-        particles.push(new Sparkle());
-      }
+  const qrContainer = document.getElementById('qr-container');
+  // Fully purge and recreate container to avoid QRCode lib conflicts
+  qrContainer.innerHTML = '';
+  const qrHolder = document.createElement('div');
+  qrHolder.id = 'qr-inner-' + Date.now();
+  qrContainer.appendChild(qrHolder);
 
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-          p.update();
-          p.draw();
-        });
-        requestAnimationFrame(animate);
-      }
-      animate();
+  const qrData = JSON.stringify({
+    id: selectedGuest.id,
+    name: selectedGuest.name,
+    table: selectedGuest.table,
+    pax: selectedGuest.pax,
+    code: code,
+    event: settings.eventName
+  });
+
+  // Defer to ensure DOM is ready (fixes blank QR on first render)
+  requestAnimationFrame(() => {
+    try {
+      new QRCode(qrHolder, {
+        text: qrData,
+        width: 164,
+        height: 164,
+        colorDark: '#1A1612',
+        colorLight: '#FFFFFF',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) {
+      console.error('QR error:', e);
+      qrHolder.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:164px;width:164px;font-size:11px;color:#8B2020;text-align:center;padding:8px;">Error al generar QR<br><code style="font-size:10px;color:#8B6914;">${code}</code></div>`;
     }
+  });
+}
 
-    // Start App Engine
-    loadData();
-  </script>
+function downloadQR() {
+  const qrContainer = document.getElementById('qr-container');
+  const qrCanvas = qrContainer.querySelector('canvas');
+  const qrImg = qrContainer.querySelector('img');
+
+  if (!qrCanvas && !qrImg) {
+    showToast('QR no disponible aún. Espera un momento.', 'ti-alert-circle');
+    return;
+  }
+
+  const offscreen = document.createElement('canvas');
+  offscreen.width = 340; offscreen.height = 420;
+  const ctx = offscreen.getContext('2d');
+
+  ctx.fillStyle = settings.theme ? settings.theme.bg : '#FAF7F2';
+  ctx.fillRect(0, 0, 340, 420);
+
+  const accentColor = settings.theme ? settings.theme.accent : '#C9A84C';
+  ctx.strokeStyle = accentColor; ctx.lineWidth = 1;
+  ctx.strokeRect(10, 10, 320, 400);
+  ctx.strokeStyle = lighten(accentColor); ctx.lineWidth = 2;
+  ctx.strokeRect(14, 14, 312, 392);
+
+  ctx.fillStyle = settings.theme ? settings.theme.accentDark || darken(accentColor) : '#8B6914';
+  ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(settings.eventName.toUpperCase(), 170, 42);
+
+  ctx.fillStyle = '#1A1612';
+  ctx.font = '300 22px Georgia, serif';
+  ctx.fillText(selectedGuest.name, 170, 78);
+
+  ctx.fillStyle = '#6B5E4E'; ctx.font = '300 13px sans-serif';
+  ctx.fillText((selectedGuest.table || 'Sin Mesa') + ' · ' + settings.eventDate, 170, 102);
+
+  const finishDownload = () => {
+    ctx.strokeStyle = lighten(accentColor);
+    ctx.beginPath(); ctx.moveTo(30,318); ctx.lineTo(310,318); ctx.stroke();
+    ctx.fillStyle = '#6B5E4E'; ctx.font = '12px sans-serif';
+    ctx.fillText('Pases: ' + selectedGuest.pax + ' | Código: ' + document.getElementById('qr-code-text').textContent, 170, 342);
+    ctx.fillStyle = settings.theme ? settings.theme.accentDark || darken(accentColor) : '#8B6914';
+    ctx.font = 'italic 11px Georgia, serif';
+    ctx.fillText('Presentar en recepción del evento', 170, 372);
+
+    const link = document.createElement('a');
+    link.download = 'pase-' + selectedGuest.id + '.png';
+    link.href = offscreen.toDataURL('image/png');
+    link.click();
+    showToast('Pase descargado', 'ti-download');
+  };
+
+  if (qrCanvas) {
+    ctx.drawImage(qrCanvas, 80, 118, 180, 180);
+    finishDownload();
+  } else if (qrImg) {
+    const tmp = new Image();
+    tmp.onload = () => { ctx.drawImage(tmp, 80, 118, 180, 180); finishDownload(); };
+    tmp.crossOrigin = 'anonymous';
+    tmp.src = qrImg.src;
+  }
+}
+
+function toggleAdmin() {
+  if (isAdminUnlocked) {
+    const s = document.getElementById('admin-section');
+    s.style.display = s.style.display === 'none' ? 'block' : 'none';
+  } else {
+    openAdminModal();
+  }
+}
+
+function openAdminModal() {
+  ['pin-1','pin-2','pin-3','pin-4'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('admin-passcode-modal').classList.add('active');
+  setTimeout(() => document.getElementById('pin-1').focus(), 300);
+}
+
+function closeAdminModal() {
+  document.getElementById('admin-passcode-modal').classList.remove('active');
+}
+
+function stepPINInput(elem, index) {
+  if (elem.value.length === 1 && index < 4) document.getElementById(`pin-${index+1}`).focus();
+  if (index === 4 && elem.value.length === 1) verifyAdminPIN();
+}
+
+function checkPINBackspace(e, index) {
+  if (e.key === 'Backspace' && !e.target.value && index > 1) document.getElementById(`pin-${index-1}`).focus();
+}
+
+function verifyAdminPIN() {
+  const entered = ['pin-1','pin-2','pin-3','pin-4'].map(id => document.getElementById(id).value).join('');
+  if (entered === (settings.adminPin || '1402')) {
+    isAdminUnlocked = true;
+    closeAdminModal();
+    document.getElementById('admin-section').style.display = 'block';
+    document.getElementById('admin-lock-icon').className = 'ti ti-lock-open';
+    showToast('Acceso concedido', 'ti-lock-open');
+  } else {
+    showToast('PIN incorrecto', 'ti-alert-triangle');
+    ['pin-1','pin-2','pin-3','pin-4'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pin-1').focus();
+  }
+}
+
+function logoutAdmin() {
+  toggleQRReader(false);
+  isAdminUnlocked = false;
+  document.getElementById('admin-section').style.display = 'none';
+  document.getElementById('admin-lock-icon').className = 'ti ti-lock';
+  showToast('Sesión cerrada', 'ti-lock');
+}
+
+function updateAdminStats() {
+  document.getElementById('stat-total').textContent = guests.length;
+  document.getElementById('stat-confirmed').textContent = guests.filter(g => g.status==='confirmed').length;
+  document.getElementById('stat-declined').textContent = guests.filter(g => g.status==='declined').length;
+  const checkedInPax = guests.filter(g => g.checkedIn).reduce((acc, g) => acc+(g.pax||0), 0);
+  document.getElementById('stat-checkedin').textContent = checkedInPax;
+}
+
+function renderAdminList() {
+  const list = document.getElementById('admin-list');
+  const sorted = [...guests].sort((a,b) => a.name.localeCompare(b.name));
+  list.innerHTML = sorted.map(g => {
+    const bc = g.status==='confirmed'?'badge-c':g.status==='declined'?'badge-d':'badge-p';
+    const bl = g.status==='confirmed'?'Confirmado':g.status==='declined'?'Declinó':'Pendiente';
+    const passesText = g.status==='confirmed'?`${g.pax}/${g.allowedPasses} pases`:`${g.allowedPasses} pases`;
+    const checkinClass = g.checkedIn ? 'ti-circle-check-filled' : 'ti-circle';
+    const checkinColor = g.checkedIn ? 'color:#4F46E5' : 'color:#D1D5DB';
+    const tableText = g.table ? `${g.table} · ` : '';
+    const qrBtn = g.status==='confirmed' ? `<button style="color:var(--accent-dark);background:none;border:none;cursor:pointer;font-size:18px;padding:4px;transition:opacity .15s;" onclick="viewGuestQRDirectly('${g.id}')" title="Ver Pase QR"><i class="ti ti-ticket"></i></button>` : '';
+    return `<div class="admin-row">
+      <button style="font-size:20px;background:none;border:none;cursor:pointer;padding:4px;${checkinColor};transition:color .15s;" onclick="toggleCheckedInStatus('${g.id}')" title="${g.checkedIn?'Check-Out':'Check-In'}">
+        <i class="ti ${checkinClass}"></i>
+      </button>
+      <div style="flex:1;min-width:0;">
+        <span style="display:block;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.name}</span>
+        <span style="display:block;font-size:12px;color:var(--muted);font-weight:300;">${tableText}${passesText}</span>
+      </div>
+      <span class="badge ${bc}">${bl}</span>
+      <div style="display:flex;align-items:center;gap:2px;">
+        ${qrBtn}
+        <button style="color:#C4958E;background:none;border:none;cursor:pointer;font-size:18px;padding:4px;transition:color .15s;" onclick="promptRemoveGuest('${g.id}')" title="Eliminar">
+          <i class="ti ti-trash"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleCheckedInStatus(id) {
+  const idx = guests.findIndex(g => g.id === id);
+  if (idx === -1) return;
+  if (guests[idx].status !== 'confirmed') {
+    showToast('Solo invitados confirmados pueden hacer check-in', 'ti-alert-circle');
+    return;
+  }
+  guests[idx].checkedIn = !guests[idx].checkedIn;
+  await saveData(); updateAdminStats(); renderAdminList();
+  showToast(guests[idx].checkedIn ? 'Ingreso registrado' : 'Ingreso anulado', guests[idx].checkedIn ? 'ti-circle-check-filled' : 'ti-circle-dot');
+}
+
+function viewGuestQRDirectly(id) {
+  selectedGuest = guests.find(g => g.id === id);
+  if (selectedGuest) { showQR(); showToast('Mostrando pase digital', 'ti-ticket'); }
+}
+
+function promptRemoveGuest(id) {
+  const overlay = document.getElementById('custom-confirm-modal');
+  const target = guests.find(g => g.id === id);
+  if (!target) return;
+  document.getElementById('confirm-title').textContent = '¿Eliminar Invitado?';
+  document.getElementById('confirm-description').textContent = `¿Eliminar a "${target.name}"? Esta acción es irreversible.`;
+  overlay.classList.add('active');
+  document.getElementById('confirm-btn-cancel').onclick = () => overlay.classList.remove('active');
+  document.getElementById('confirm-btn-action').onclick = async () => {
+    overlay.classList.remove('active');
+    guests = guests.filter(g => g.id !== id);
+    await saveData(); updateAdminStats(); renderAdminList();
+    showToast('Invitado eliminado', 'ti-trash');
+  };
+}
+
+// Fix #5: Toggle table input
+function toggleTableInput() {
+  const checked = document.getElementById('use-table-toggle').checked;
+  const tableInput = document.getElementById('new-guest-table');
+  tableInput.disabled = !checked;
+  tableInput.style.opacity = checked ? '1' : '0.4';
+  if (!checked) tableInput.value = '';
+}
+
+async function addGuest() {
+  const name = document.getElementById('new-guest-name').value.trim();
+  const useTable = document.getElementById('use-table-toggle').checked;
+  const table = useTable ? (document.getElementById('new-guest-table').value.trim() || 'Mesa 1') : '';
+  const passes = parseInt(document.getElementById('new-guest-passes').value) || 2;
+  if (!name) { showToast('Ingresa el nombre del invitado', 'ti-alert-circle'); return; }
+  const id = 'g' + Date.now().toString(36);
+  guests.push({ id, name, table, status:'pending', dietary:'', allowedPasses:passes, pax:passes, adults:passes, kids:0, checkedIn:false });
+  await saveData(); updateAdminStats(); renderAdminList();
+  document.getElementById('new-guest-name').value = '';
+  document.getElementById('new-guest-table').value = '';
+  document.getElementById('new-guest-passes').value = '2';
+  showToast('Invitado agregado', 'ti-user-plus');
+}
+
+function toggleQRReader(forceState = null) {
+  const container = document.getElementById('qr-scanner-container');
+  const isVisible = forceState !== null ? !forceState : container.style.display === 'block';
+  if (isVisible) {
+    container.style.display = 'none';
+    if (html5QrcodeScanner) { html5QrcodeScanner.stop().then(()=>{ html5QrcodeScanner=null; }).catch(()=>{}); }
+  } else {
+    container.style.display = 'block';
+    startQRScanner();
+  }
+}
+
+function startQRScanner() {
+  if (html5QrcodeScanner) { html5QrcodeScanner.clear(); }
+  html5QrcodeScanner = new Html5Qrcode('reader');
+  html5QrcodeScanner.start({facingMode:'environment'}, {fps:10,qrbox:{width:250,height:250}}, onScanSuccess, ()=>{})
+    .catch(err => {
+      showToast('No se pudo iniciar la cámara', 'ti-alert-circle');
+      document.getElementById('qr-scanner-container').style.display = 'none';
+    });
+}
+
+function onScanSuccess(decodedText) {
+  if (html5QrcodeScanner) html5QrcodeScanner.pause(true);
+  try {
+    const data = JSON.parse(decodedText);
+    if (data && data.id) { openScanResultModal(data); return; }
+  } catch(e) {}
+  const matched = guests.find(g => g.id.toUpperCase() === decodedText.trim().toUpperCase());
+  if (matched) { openScanResultModal({id:matched.id}); }
+  else { showToast('Código no válido para este evento', 'ti-alert-triangle'); setTimeout(()=>{ if(html5QrcodeScanner) html5QrcodeScanner.resume(); },2000); }
+}
+
+function openScanResultModal(qrData) {
+  const guest = guests.find(g => g.id === qrData.id);
+  if (!guest) { showToast('Invitado no encontrado', 'ti-user-x'); setTimeout(()=>{ if(html5QrcodeScanner) html5QrcodeScanner.resume(); },2000); return; }
+  scannedGuestObj = guest;
+  document.getElementById('scan-guest-name').textContent = guest.name;
+  document.getElementById('scan-guest-table').textContent = guest.table || 'Sin Mesa';
+  document.getElementById('scan-guest-pax').textContent = guest.status==='confirmed' ? `${guest.pax} (${guest.adults||0} ad, ${guest.kids||0} niñ)` : `Sin confirmar (${guest.allowedPasses} asignados)`;
+  if (guest.dietary) {
+    document.getElementById('scan-dietary-row').style.display = 'block';
+    document.getElementById('scan-guest-dietary').textContent = guest.dietary;
+  } else { document.getElementById('scan-dietary-row').style.display = 'none'; }
+  const badge = document.getElementById('scan-guest-badge');
+  const actionBtn = document.getElementById('scan-action-btn');
+  if (guest.status !== 'confirmed') {
+    badge.style.cssText = 'padding:10px;border-radius:4px;text-align:center;font-weight:700;font-size:12px;margin-top:8px;background:#FEE2E2;color:#991B1B;display:flex;align-items:center;justify-content:center;gap:6px;';
+    badge.innerHTML = '<i class="ti ti-alert-triangle"></i> No ha confirmado asistencia';
+    actionBtn.style.display = 'none';
+  } else if (guest.checkedIn) {
+    badge.style.cssText = 'padding:10px;border-radius:4px;text-align:center;font-weight:700;font-size:12px;margin-top:8px;background:#FEF3C7;color:#92400E;display:flex;align-items:center;justify-content:center;gap:6px;';
+    badge.innerHTML = '<i class="ti ti-alert-circle"></i> ¡Entrada ya registrada!';
+    actionBtn.style.display = 'block'; actionBtn.textContent = 'Volver a Registrar';
+  } else {
+    badge.style.cssText = 'padding:10px;border-radius:4px;text-align:center;font-weight:700;font-size:12px;margin-top:8px;background:#DCFCE7;color:#166534;display:flex;align-items:center;justify-content:center;gap:6px;';
+    badge.innerHTML = '<i class="ti ti-circle-check"></i> Entrada válida — Listo para ingresar';
+    actionBtn.style.display = 'block'; actionBtn.textContent = 'Confirmar Entrada';
+  }
+  document.getElementById('scan-result-modal').classList.add('active');
+}
+
+function closeScanModal() {
+  document.getElementById('scan-result-modal').classList.remove('active');
+  scannedGuestObj = null;
+  setTimeout(()=>{ if(html5QrcodeScanner) html5QrcodeScanner.resume(); },1000);
+}
+
+async function executeScanCheckin() {
+  if (!scannedGuestObj) return;
+  const idx = guests.findIndex(g => g.id === scannedGuestObj.id);
+  if (idx !== -1) {
+    guests[idx].checkedIn = true;
+    await saveData(); updateAdminStats(); renderAdminList();
+    showToast(`Entrada registrada: ${scannedGuestObj.name}`, 'ti-circle-check-filled');
+  }
+  document.getElementById('scan-result-modal').classList.remove('active');
+  scannedGuestObj = null;
+  setTimeout(()=>{ if(html5QrcodeScanner) html5QrcodeScanner.resume(); },1000);
+}
+
+function exportToCSV() {
+  if (!guests.length) return;
+  const headers = ['ID','Nombre','Mesa','Adultos','Niños','Total Pases','Límite Pases','Estado RSVP','Check-In','Restricciones'];
+  const rows = guests.map(g => [g.id,g.name,g.table||'Sin Mesa',g.adults||0,g.kids||0,g.pax||0,g.allowedPasses||2,g.status,g.checkedIn?'SI':'NO',g.dietary||'']);
+  const csv = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(','), ...rows.map(r => r.map(v=>`"${v}"`).join(','))].join('\n');
+  const link = document.createElement('a');
+  link.href = encodeURI(csv);
+  link.download = 'invitados_boda.csv';
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  showToast('Lista exportada como CSV', 'ti-file-spreadsheet');
+}
+
+function showToast(text, icon='ti-circle-check') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = text;
+  document.getElementById('toast-icon').className = `ti ${icon}`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function initSparkles() {
+  const canvas = document.getElementById('sparkle-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize); resize();
+  class Sparkle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random()*canvas.width; this.y = canvas.height+10;
+      this.size = Math.random()*2+.5; this.speedX = Math.random()*.4-.2;
+      this.speedY = Math.random()*.4+.2; this.opacity = Math.random()*.5+.1;
+      this.fade = Math.random()*.01+.002;
+    }
+    update() {
+      this.x += this.speedX; this.y -= this.speedY; this.opacity -= this.fade;
+      if (this.opacity <= 0 || this.y < 0) this.reset();
+    }
+    draw() {
+      const accentHex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#C9A84C';
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${hexToRgb(accentHex)}, ${this.opacity})`; ctx.fill();
+    }
+  }
+  function hexToRgb(hex) {
+    hex = hex.replace('#','');
+    if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+    return [parseInt(hex.slice(0,2),16),parseInt(hex.slice(2,4),16),parseInt(hex.slice(4,6),16)].join(',');
+  }
+  for (let i=0; i<35; i++) particles.push(new Sparkle());
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{ p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+loadData();
+</script>
 </body>
 </html>
