@@ -1197,16 +1197,42 @@
 
     // Premium Default Wedding Database Backup (with "allowedPasses" / pases asignados)
     const defaultGuests = [
-      { id:'g001', name:'Ana Martínez López', table:'Mesa 1', status:'pending', dietary:'', allowedPasses:2, adults:2, kids:0 },
-      { id:'g002', name:'Carlos Mendoza', table:'Mesa 2', status:'pending', dietary:'', allowedPasses:3, adults:2, kids:1 },
-      { id:'g003', name:'Laura Jiménez', table:'Mesa 1', status:'pending', dietary:'', allowedPasses:2, adults:2, kids:0 },
-      { id:'g004', name:'Roberto García Soto', table:'Mesa 3', status:'pending', dietary:'', allowedPasses:4, adults:2, kids:2 },
-      { id:'g005', name:'Fernanda López', table:'Mesa 2', status:'pending', dietary:'', allowedPasses:2, adults:2, kids:0 },
-      { id:'g006', name:'Miguel Ángel Torres', table:'Mesa 4', status:'pending', dietary:'', allowedPasses:2, adults:2, kids:0 },
-      { id:'g007', name:'Patricia Ruiz', table:'Mesa 3', status:'pending', dietary:'', allowedPasses:2, adults:1, kids:1 },
-      { id:'g008', name:'Javier Hernández', table:'Mesa 4', status:'pending', dietary:'', allowedPasses:3, adults:3, kids:0 },
-      { id:'g009', name:'Diana Castillo', table:'Mesa 5', status:'pending', dietary:'', allowedPasses:2, adults:2, kids:0 },
-      { id:'g010', name:'Eduardo Reyes', table:'Mesa 5', status:'pending', dietary:'', allowedPasses:2, adults:2, kids:0 },
+     {
+  id:'g001',
+  token: crypto.randomUUID(),
+  name:'Ana Martínez López',
+  table:'Mesa 1',
+  status:'pending',
+  dietary:'',
+  allowedPasses:2,
+  adults:2,
+  kids:0,
+  checkedIn:false
+}
+    {
+  id:'g002',
+  token: crypto.randomUUID(),
+  name:'Ana Martínez López',
+  table:'Mesa 1',
+  status:'pending',
+  dietary:'',
+  allowedPasses:2,
+  adults:2,
+  kids:0,
+  checkedIn:false
+}
+    {
+  id:'g003',
+  token: crypto.randomUUID(),
+  name:'Ana Martínez López',
+  table:'Mesa 1',
+  status:'pending',
+  dietary:'',
+  allowedPasses:2,
+  adults:2,
+  kids:0,
+  checkedIn:false
+}
     ];
 
     // Safe, multi-platform database helper
