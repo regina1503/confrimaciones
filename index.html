@@ -87,7 +87,7 @@
     .qr-event-name{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem;font-weight:400}
     .qr-detail{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;padding:8px 0;border-top:.5px solid #EDE5D8}
     .qr-detail span:last-child{color:var(--dark);font-weight:500}
-    #qr-container{width:180px;height:180px;margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center}
+    #qr-container{width:200px;height:200px;margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:4px}
     #qr-container img,#qr-container canvas{max-width:100%;max-height:100%;display:block}
     .download-btn{width:100%;padding:14px;background:var(--accent-dark);color:white;border:none;border-radius:4px;font-family:var(--font-body);font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:filter .2s,transform .15s;font-weight:500}
     .download-btn:hover{filter:brightness(.85)}
@@ -158,7 +158,7 @@
     /* ── MODALS ── */
     .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(26,22,18,.6);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
     .modal-overlay.active{opacity:1;pointer-events:auto}
-    .modal-box{background:var(--surface);border:1px solid var(--accent);border-radius:8px;width:90%;max-width:380px;padding:2rem;text-align:center;box-shadow:0 15px 35px rgba(0,0,0,.2);transform:scale(.9);transition:transform .3s}
+    .modal-box{background:var(--surface);border:1px solid var(--accent);border-radius:8px;width:90%;max-width:420px;padding:2rem;text-align:center;box-shadow:0 15px 35px rgba(0,0,0,.2);transform:scale(.9);transition:transform .3s}
     .modal-overlay.active .modal-box{transform:scale(1)}
     .pin-input-container{display:flex;justify-content:center;gap:12px;margin:1.5rem 0}
     .pin-digit{width:50px;height:50px;border:1px solid #C8BAA6;border-radius:6px;text-align:center;font-size:24px;font-weight:600;color:var(--dark);background:#FAF7F2;outline:none;transition:border-color .2s,box-shadow .2s}
@@ -174,6 +174,17 @@
 
     /* QR scanner */
     #qr-scanner-container{display:none;background:#FAF7F2;border:1px dashed var(--accent);border-radius:6px;padding:1rem;margin-bottom:1.5rem;text-align:center}
+
+    /* Edit button */
+    .btn-edit{color:var(--accent-dark);background:none;border:none;cursor:pointer;font-size:18px;padding:3px;transition:color .15s}
+    .btn-edit:hover{color:var(--dark)}
+
+    /* Edit form in modal */
+    .edit-form{text-align:left;margin-top:1rem}
+    .edit-field{margin-bottom:12px}
+    .edit-field label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-weight:500}
+    .edit-field input,.edit-field select{width:100%;padding:10px 12px;border:.5px solid #C8BAA6;border-radius:4px;font-family:var(--font-body);font-size:14px;background:var(--surface);color:var(--dark);outline:none}
+    .edit-field input:focus,.edit-field select:focus{border-color:var(--accent)}
 
     /* misc */
     .section-divider{font-family:var(--font-display);font-size:18px;font-weight:500;color:var(--dark);padding:1rem 1.5rem .75rem;border-bottom:.5px solid #EDE5D8;background:#F9F4EB;display:flex;align-items:center;gap:8px}
@@ -424,8 +435,8 @@
           </button>
         </div>
         <div class="stats-row">
-          <div class="stat-cell"><div class="stat-num" style="color:var(--accent-dark)" id="stat-total">0</div><div class="stat-lbl">Invitados</div></div>
-          <div class="stat-cell"><div class="stat-num" style="color:#4A7A28" id="stat-confirmed">0</div><div class="stat-lbl">Confirmados</div></div>
+          <div class="stat-cell"><div class="stat-num" style="color:var(--accent-dark)" id="stat-total">0</div><div class="stat-lbl">Total Pases</div></div>
+          <div class="stat-cell"><div class="stat-num" style="color:#4A7A28" id="stat-confirmed">0</div><div class="stat-lbl">Pases Confirmados</div></div>
           <div class="stat-cell"><div class="stat-num" style="color:var(--rose)" id="stat-declined">0</div><div class="stat-lbl">Declinaron</div></div>
           <div class="stat-cell"><div class="stat-num" style="color:#4F46E5" id="stat-checkedin">0</div><div class="stat-lbl">En Salón</div></div>
         </div>
@@ -494,6 +505,34 @@
   </div>
 </div>
 
+<!-- MODAL: Edit Guest -->
+<div id="edit-guest-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div style="font-size:36px;color:var(--accent-dark);margin-bottom:8px"><i class="ti ti-user-edit"></i></div>
+    <h3 style="font-family:var(--font-display);font-size:22px;color:var(--dark);font-weight:600">Editar Invitado</h3>
+    <div class="edit-form">
+      <div class="edit-field">
+        <label>Nombre completo</label>
+        <input type="text" id="edit-guest-name" placeholder="Nombre del invitado"/>
+      </div>
+      <div class="edit-field">
+        <label>Mesa asignada</label>
+        <select id="edit-guest-table">
+          <option value="">Sin mesa</option>
+        </select>
+      </div>
+      <div class="edit-field">
+        <label>Pases permitidos</label>
+        <input type="number" id="edit-guest-passes" min="1" max="20" value="2"/>
+      </div>
+    </div>
+    <div class="modal-btn-row">
+      <button class="btn-modal-cancel" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn-modal-ok" onclick="saveEditedGuest()">Guardar Cambios</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Scan Result -->
 <div id="scan-result-modal" class="modal-overlay">
   <div class="modal-box" style="max-width:360px">
@@ -539,9 +578,9 @@
 /* ══════════════════════════════════════════════════════════
    DATA
 ══════════════════════════════════════════════════════════ */
-const STORAGE_KEY  = 'event_guests_v4';
-const SETTINGS_KEY = 'event_settings_v4';
-const TABLES_KEY   = 'event_tables_v4';
+const STORAGE_KEY  = 'event_guests_v5';
+const SETTINGS_KEY = 'event_settings_v5';
+const TABLES_KEY   = 'event_tables_v5';
 
 const defaultGuests = [
   {id:'g001',name:'Ana Martínez López',  table:'Mesa 1',status:'pending',dietary:'',allowedPasses:2,adults:2,kids:0,pax:2,checkedIn:false},
@@ -595,6 +634,8 @@ const storage = {
 
 let guests=[], tables=[], selectedGuest=null, attending=null, isAdminUnlocked=false;
 let html5QrcodeScanner=null, scannedGuestObj=null;
+let editingGuestId = null;
+let qrCodeInstance = null;
 let settings = {
   eventType:'boda', eventName:'', person1:'', person2:'', eventDate:'', eventTime:'',
   adminPin:'1402', passType:'adultokid',
@@ -901,49 +942,121 @@ function showQR(){
   document.getElementById('qr-code-text').textContent=code;
   selectedGuest.qrCode=code;
 
+  // Clear previous QR
   const qrContainer=document.getElementById('qr-container');
   qrContainer.innerHTML='';
-  const holder=document.createElement('div');
-  qrContainer.appendChild(holder);
 
-  const qrData=JSON.stringify({id:selectedGuest.id,name:selectedGuest.name,table:selectedGuest.table,pax:selectedGuest.pax,code,event:settings.eventName||''});
-  requestAnimationFrame(()=>{
-    try{
-      new QRCode(holder,{text:qrData,width:164,height:164,colorDark:'#1A1612',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M});
-    }catch(e){
-      holder.innerHTML=`<div style="width:164px;height:164px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#8B2020;text-align:center;padding:8px">Error QR<br><code>${code}</code></div>`;
-    }
+  // Create QR data
+  const qrData=JSON.stringify({
+    id:selectedGuest.id,
+    name:selectedGuest.name,
+    table:selectedGuest.table,
+    pax:selectedGuest.pax,
+    code,
+    event:settings.eventName||''
   });
+
+  // Generate QR code properly
+  setTimeout(()=>{
+    try {
+      qrCodeInstance = new QRCode(qrContainer, {
+        text: qrData,
+        width: 180,
+        height: 180,
+        colorDark: '#1A1612',
+        colorLight: '#FFFFFF',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) {
+      qrContainer.innerHTML=`<div style="width:180px;height:180px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#8B2020;text-align:center;padding:8px;border:1px solid #C4958E;border-radius:4px">Error al generar QR<br><code style="font-size:12px;margin-top:4px;display:block">${code}</code></div>`;
+    }
+  }, 100);
 }
 
 function downloadQR(){
   const qrContainer=document.getElementById('qr-container');
   const qrCanvas=qrContainer.querySelector('canvas');
   const qrImg=qrContainer.querySelector('img');
-  if(!qrCanvas&&!qrImg){ showToast('QR no disponible aún','ti-alert-circle'); return; }
-  const off=document.createElement('canvas'); off.width=340; off.height=420;
+
+  if(!qrCanvas && !qrImg){
+    showToast('QR no disponible aún, espera un momento','ti-alert-circle');
+    return;
+  }
+
+  const off=document.createElement('canvas');
+  off.width=340;
+  off.height=420;
   const ctx=off.getContext('2d');
+
   const t=settings.theme||THEME_PRESETS[0];
-  ctx.fillStyle=t.bg||'#FAF7F2'; ctx.fillRect(0,0,340,420);
-  ctx.strokeStyle=t.accent||'#C9A84C'; ctx.lineWidth=1; ctx.strokeRect(10,10,320,400);
-  ctx.strokeStyle=t.accentLight||'#E8D5A3'; ctx.lineWidth=2; ctx.strokeRect(14,14,312,392);
-  ctx.fillStyle=t.accentDark||'#8B6914'; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+
+  // Background
+  ctx.fillStyle=t.bg||'#FAF7F2';
+  ctx.fillRect(0,0,340,420);
+
+  // Border
+  ctx.strokeStyle=t.accent||'#C9A84C';
+  ctx.lineWidth=1;
+  ctx.strokeRect(10,10,320,400);
+
+  // Inner border
+  ctx.strokeStyle=t.accentLight||'#E8D5A3';
+  ctx.lineWidth=2;
+  ctx.strokeRect(14,14,312,392);
+
+  // Event name
+  ctx.fillStyle=t.accentDark||'#8B6914';
+  ctx.font='bold 11px sans-serif';
+  ctx.textAlign='center';
   ctx.fillText((settings.eventName||getEventTypeName(settings.eventType)).toUpperCase(),170,42);
-  ctx.fillStyle=t.header||'#1A1612'; ctx.font='300 22px Georgia,serif';
+
+  // Guest name
+  ctx.fillStyle=t.header||'#1A1612';
+  ctx.font='300 22px Georgia,serif';
   ctx.fillText(selectedGuest.name,170,78);
-  ctx.fillStyle='#6B5E4E'; ctx.font='300 13px sans-serif';
+
+  // Table and date
+  ctx.fillStyle='#6B5E4E';
+  ctx.font='300 13px sans-serif';
   ctx.fillText((selectedGuest.table||'Sin Mesa')+' · '+(settings.eventDate||''),170,102);
+
   const finish=()=>{
-    ctx.strokeStyle=t.accentLight||'#E8D5A3'; ctx.beginPath(); ctx.moveTo(30,318); ctx.lineTo(310,318); ctx.stroke();
-    ctx.fillStyle='#6B5E4E'; ctx.font='12px sans-serif';
+    ctx.strokeStyle=t.accentLight||'#E8D5A3';
+    ctx.beginPath();
+    ctx.moveTo(30,318);
+    ctx.lineTo(310,318);
+    ctx.stroke();
+
+    ctx.fillStyle='#6B5E4E';
+    ctx.font='12px sans-serif';
     ctx.fillText('Pases: '+selectedGuest.pax+' | Código: '+document.getElementById('qr-code-text').textContent,170,342);
-    ctx.fillStyle=t.accentDark||'#8B6914'; ctx.font='italic 11px Georgia,serif';
+
+    ctx.fillStyle=t.accentDark||'#8B6914';
+    ctx.font='italic 11px Georgia,serif';
     ctx.fillText('Presentar en recepción del evento',170,372);
-    const link=document.createElement('a'); link.download='pase-'+selectedGuest.id+'.png'; link.href=off.toDataURL('image/png'); link.click();
+
+    const link=document.createElement('a');
+    link.download='pase-'+selectedGuest.id+'.png';
+    link.href=off.toDataURL('image/png');
+    link.click();
     showToast('Pase descargado','ti-download');
   };
-  if(qrCanvas){ ctx.drawImage(qrCanvas,80,118,180,180); finish(); }
-  else{ const tmp=new Image(); tmp.onload=()=>{ ctx.drawImage(tmp,80,118,180,180); finish(); }; tmp.crossOrigin='anonymous'; tmp.src=qrImg.src; }
+
+  if(qrCanvas){
+    ctx.drawImage(qrCanvas,80,118,180,180);
+    finish();
+  } else if(qrImg){
+    const tmp=new Image();
+    tmp.crossOrigin='anonymous';
+    tmp.onload=()=>{
+      ctx.drawImage(tmp,80,118,180,180);
+      finish();
+    };
+    tmp.onerror=()=>{
+      showToast('Error al cargar QR para descargar','ti-alert-circle');
+    };
+    tmp.src=qrImg.src;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -975,10 +1088,20 @@ function verifyAdminPIN(){
 function logoutAdmin(){ toggleQRReader(false); isAdminUnlocked=false; document.getElementById('admin-section').style.display='none'; document.getElementById('admin-lock-icon').className='ti ti-lock'; showToast('Sesión cerrada','ti-lock'); }
 
 function updateAdminStats(){
-  document.getElementById('stat-total').textContent=guests.length;
-  document.getElementById('stat-confirmed').textContent=guests.filter(g=>g.status==='confirmed').length;
+  // Total de pases asignados
+  const totalPases = guests.reduce((sum,g)=>sum+(g.allowedPasses||0),0);
+  document.getElementById('stat-total').textContent=totalPases;
+
+  // Pases confirmados (suma de pax de confirmados)
+  const pasesConfirmados = guests.filter(g=>g.status==='confirmed').reduce((sum,g)=>sum+(g.pax||0),0);
+  document.getElementById('stat-confirmed').textContent=pasesConfirmados;
+
+  // Invitados que declinaron (cantidad de personas, no pases)
   document.getElementById('stat-declined').textContent=guests.filter(g=>g.status==='declined').length;
-  document.getElementById('stat-checkedin').textContent=guests.filter(g=>g.checkedIn).reduce((a,g)=>a+(g.pax||0),0);
+
+  // Personas en salón
+  const enSalon = guests.filter(g=>g.checkedIn).reduce((sum,g)=>sum+(g.pax||0),0);
+  document.getElementById('stat-checkedin').textContent=enSalon;
 }
 
 function renderAdminList(){
@@ -995,9 +1118,74 @@ function renderAdminList(){
       <button style="font-size:20px;background:none;border:none;cursor:pointer;padding:3px;${ciC}" onclick="toggleCheckedIn('${g.id}')" title="Check-In"><i class="ti ${ciI}"></i></button>
       <div style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${g.name}</span><span style="display:block;font-size:12px;color:var(--muted)">${sub}</span></div>
       <span class="badge ${bc}">${bl}</span>
-      <div style="display:flex;align-items:center;gap:2px">${qrB}<button style="color:#C4958E;background:none;border:none;cursor:pointer;font-size:18px;padding:3px" onclick="promptRemoveGuest('${g.id}')"><i class="ti ti-trash"></i></button></div>
+      <div style="display:flex;align-items:center;gap:2px">
+        <button class="btn-edit" onclick="openEditModal('${g.id}')" title="Editar"><i class="ti ti-edit"></i></button>
+        ${qrB}
+        <button style="color:#C4958E;background:none;border:none;cursor:pointer;font-size:18px;padding:3px" onclick="promptRemoveGuest('${g.id}')" title="Eliminar"><i class="ti ti-trash"></i></button>
+      </div>
     </div>`;
   }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════
+   EDIT GUEST
+══════════════════════════════════════════════════════════ */
+function openEditModal(guestId){
+  const guest = guests.find(g=>g.id===guestId);
+  if(!guest) return;
+  editingGuestId = guestId;
+
+  document.getElementById('edit-guest-name').value = guest.name || '';
+  document.getElementById('edit-guest-passes').value = guest.allowedPasses || 2;
+
+  // Populate table select
+  const tableSelect = document.getElementById('edit-guest-table');
+  tableSelect.innerHTML = '<option value="">Sin mesa</option>';
+  tables.forEach(t=>{
+    const selected = guest.table === t.name ? 'selected' : '';
+    tableSelect.innerHTML += `<option value="${t.name}" ${selected}>${t.name}</option>`;
+  });
+
+  document.getElementById('edit-guest-modal').classList.add('active');
+}
+
+function closeEditModal(){
+  document.getElementById('edit-guest-modal').classList.remove('active');
+  editingGuestId = null;
+}
+
+async function saveEditedGuest(){
+  if(!editingGuestId) return;
+
+  const idx = guests.findIndex(g=>g.id===editingGuestId);
+  if(idx === -1) return;
+
+  const newName = document.getElementById('edit-guest-name').value.trim();
+  const newTable = document.getElementById('edit-guest-table').value;
+  const newPasses = parseInt(document.getElementById('edit-guest-passes').value)||2;
+
+  if(!newName){
+    showToast('El nombre no puede estar vacío','ti-alert-circle');
+    return;
+  }
+
+  guests[idx].name = newName;
+  guests[idx].table = newTable;
+  guests[idx].allowedPasses = newPasses;
+
+  // Si estaba confirmado y los pases cambiaron, verificar que no excedan
+  if(guests[idx].status === 'confirmed' && guests[idx].pax > newPasses){
+    guests[idx].pax = newPasses;
+    guests[idx].adults = newPasses;
+    guests[idx].kids = 0;
+  }
+
+  await saveData();
+  updateAdminStats();
+  renderAdminList();
+  renderTablesMap();
+  closeEditModal();
+  showToast('Invitado actualizado','ti-circle-check');
 }
 
 async function toggleCheckedIn(id){
@@ -1109,7 +1297,17 @@ function promptRemoveTable(id){
   document.getElementById('confirm-description').textContent=`¿Eliminar "${target.name}"? Los invitados asignados a esta mesa quedarán sin mesa.`;
   overlay.classList.add('active');
   document.getElementById('confirm-btn-cancel').onclick=()=>overlay.classList.remove('active');
-  document.getElementById('confirm-btn-action').onclick=async()=>{ overlay.classList.remove('active'); tables=tables.filter(t=>t.id!==id); await saveTablesData(); renderTablesMap(); showToast('Mesa eliminada','ti-trash'); };
+  document.getElementById('confirm-btn-action').onclick=async()=>{
+    overlay.classList.remove('active');
+    tables=tables.filter(t=>t.id!==id);
+    // Remove table assignment from guests
+    guests.forEach(g=>{ if(g.table===target.name) g.table=''; });
+    await saveTablesData();
+    await saveData();
+    renderTablesMap();
+    renderAdminList();
+    showToast('Mesa eliminada','ti-trash');
+  };
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1149,7 +1347,7 @@ function openScanResultModal(qrData){
   const badge=document.getElementById('scan-guest-badge');
   const btn=document.getElementById('scan-action-btn');
   if(g.status!=='confirmed'){ badge.style.cssText='padding:10px;border-radius:4px;font-weight:700;font-size:12px;margin-top:8px;background:#FEE2E2;color:#991B1B;display:flex;align-items:center;justify-content:center;gap:6px'; badge.innerHTML='<i class="ti ti-alert-triangle"></i> No ha confirmado asistencia'; btn.style.display='none'; }
-  else if(g.checkedIn){ badge.style.cssText='padding:10px;border-radius:4px;font-weight:700;font-size:12px;margin-top:8px;background:#FEF3C7;color:#92400E;display:flex;align-items:center;justify-content:center;gap:6px'; badge.innerHTML='<i class="ti ti-alert-circle"></i> ¡Entrada ya registrada!'; btn.style.display='block'; btn.textContent='Volver a Registrar'; }
+  else if(g.checkedIn){ badge.style.cssText='padding:10px;border-radius:4px;font-weight:700;font-size:12px;margin-top:8px;background:#FEF3C7;color:#92400E;display:flex;align-items:center;justify-content:center;gap:6px'; badge.innerHTML='<i class="ti ti-alert-circle"></i>¡Entrada ya registrada!'; btn.style.display='block'; btn.textContent='Volver a Registrar'; }
   else{ badge.style.cssText='padding:10px;border-radius:4px;font-weight:700;font-size:12px;margin-top:8px;background:#DCFCE7;color:#166534;display:flex;align-items:center;justify-content:center;gap:6px'; badge.innerHTML='<i class="ti ti-circle-check"></i> Entrada válida'; btn.style.display='block'; btn.textContent='Confirmar Entrada'; }
   document.getElementById('scan-result-modal').classList.add('active');
 }
