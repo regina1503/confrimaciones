@@ -1031,15 +1031,8 @@ function showQR(){
   const qrContainer=document.getElementById('qr-container');
   qrContainer.innerHTML='';
 
-  // Create QR data
-  const qrData=JSON.stringify({
-    id:selectedGuest.id,
-    name:selectedGuest.name,
-    table:selectedGuest.table,
-    pax:selectedGuest.pax,
-    code,
-    event:settings.eventName||''
-  });
+  // Create QR data — solo lo esencial (evita fallos con acentos/ñ en nombres largos)
+  const qrData=JSON.stringify({id:selectedGuest.id,code});
 
   // Generate QR code properly
   setTimeout(()=>{
